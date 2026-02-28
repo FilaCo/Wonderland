@@ -1,4 +1,9 @@
 {
-    "C_Cpp.default.compileCommands": "c:\\Users\\FilaCo\\Projects\\Wonderland\\builddir/compile_commands.json",
-    "C_Cpp.default.configurationProvider": "mesonbuild.mesonbuild"
+    "[c]": {
+        "editor.defaultFormatter": "xaver.clang-format"
+    },
+    "[cpp]": {
+        "editor.defaultFormatter": "xaver.clang-format"
+    },
+    "mesonbuild.buildFolder": "build",
 }

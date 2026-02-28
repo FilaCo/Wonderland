@@ -1,0 +1,2 @@
+subdir('stdx')
+subdir('wecs')

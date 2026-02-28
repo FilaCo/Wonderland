@@ -1,6 +1,14 @@
-project('Wonderland', 'c')
+project(
+    'wonderland',
+    'c',
+    default_options: ['warning_level=3', 'werror=true', 'c_std=c23'],
+    meson_version: '>= 1.3.0',
+    version: '0.1.0',
+    license: 'MIT',
+)
 
-sdl3_dep = dependency('sdl3')
+unity = subproject('unity')
+unity_dep = unity.get_variable('unity_dep')
+unity_gen_runner = unity.get_variable('gen_test_runner')
 
-executable('Wonderland', 'src/main.c',
-           dependencies: [sdl3_dep])
+subdir('libs')
