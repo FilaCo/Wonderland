@@ -5,6 +5,10 @@
 
 void *test_alloc([[maybe_unused]] void *ctx, void *ptr,
                  [[maybe_unused]] size_t osize, size_t nsize) {
+  if (nsize == 0) {
+    free(ptr);
+    return NULL;
+  }
   return realloc(ptr, nsize);
 }
 
@@ -12,76 +16,60 @@ void setUp(void) {}
 
 void tearDown(void) {}
 
-// void it_spawns_id(void) {
-//   // arrange
-//   registry sut = registry_new(test_alloc);
-//   id expected = 0;
+void test_registry_spawn(void) {
+  // arrange
+  registry sut = registry_new(test_alloc);
+  id expected = 0;
 
-//   // act
-//   id actual = registry_spawn(sut);
+  // act
+  id actual = registry_spawn(sut);
 
-//   // assert
-//   TEST_ASSERT_EQUAL(expected, actual);
+  // assert
+  TEST_ASSERT_EQUAL(expected, actual);
+  TEST_ASSERT_TRUE(registry_is_alive(sut, actual));
 
-//   // cleanup
-//   registry_free(sut);
-// }
+  // cleanup
+  registry_free(sut);
+}
 
-// void test_vec_push(void) {
-//   // arrange
-//   vec_int sut = vec_int_new(test_alloc);
-//   int elem = 42;
+void test_registry_despawn(void) {
+  // arrange
+  registry sut = registry_new(test_alloc);
+  id id_ = registry_spawn(sut);
 
-//   // act
-//   sut = vec_int_push(sut, elem);
+  // act
+  registry_despawn(sut, id_);
 
-//   // assert
-//   TEST_ASSERT_EQUAL(1, vec_int_size(sut));
-//   TEST_ASSERT_EQUAL(1, vec_int_cap(sut));
-//   TEST_ASSERT_EQUAL(elem, sut[0]);
+  // assert
+  TEST_ASSERT_TRUE(registry_is_dead(sut, id_));
 
-//   // cleanup
-//   vec_int_free(sut);
-// }
+  // cleanup
+  registry_free(sut);
+}
 
-// void test_vec_pop(void) {
-//   // arrange
-//   vec_int sut = vec_int_new(test_alloc);
-//   int elem0 = 42, elem1 = 123, elem2 = -100500;
-//   sut = vec_int_push(sut, elem0);
-//   sut = vec_int_push(sut, elem1);
-//   sut = vec_int_push(sut, elem2);
+void test_registry_spawn_with_recycling(void) {
+  // arrange
+  registry sut = registry_new(test_alloc);
 
-//   // act
-//   int *actual = vec_int_pop(sut);
+  // act
+  for (int i = 0; i < 10; ++i) {
+    registry_spawn(sut);
+  }
 
-//   // assert
-//   TEST_ASSERT_EQUAL(2, vec_int_size(sut));
-//   TEST_ASSERT_EQUAL(4, vec_int_cap(sut));
-//   TEST_ASSERT_EQUAL(elem0, sut[0]);
-//   TEST_ASSERT_EQUAL(elem1, sut[1]);
-//   TEST_ASSERT_EQUAL(elem2, *actual);
+  for (uint32_t i = 0; i < 10; i += 2) {
+    registry_despawn(sut, i);
+  }
 
-//   // cleanup
-//   vec_int_free(sut);
-// }
+  // assert
+  for (uint32_t i = 0; i < 10; ++i) {
+    TEST_ASSERT_EQUAL((i & 1) == 0, registry_is_dead(sut, i));
+  }
 
-// void test_vec_push_grow(void) {
-//   // arrange
-//   vec_int sut = vec_int_new(test_alloc);
+  for (uint32_t i = 0; i < 10; i += 2) {
+    id id_ = (8 - i) | (1 << 20);
+    TEST_ASSERT_EQUAL(id_, registry_spawn(sut));
+  }
 
-//   // act
-//   for (int i = 0; i < 10; ++i) {
-//     sut = vec_int_push(sut, i);
-//   }
-
-//   // assert
-//   TEST_ASSERT_EQUAL(10, vec_int_size(sut));
-//   TEST_ASSERT_EQUAL(16, vec_int_cap(sut));
-//   for (int i = 0; i < 10; ++i) {
-//     TEST_ASSERT_EQUAL(i, sut[i]);
-//   }
-
-//   // cleanup
-//   vec_int_free(sut);
-// }
+  // cleanup
+  registry_free(sut);
+}

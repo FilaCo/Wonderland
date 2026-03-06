@@ -7,14 +7,18 @@ DEFINE_VEC(int)
 
 void *test_alloc([[maybe_unused]] void *ctx, void *ptr,
                  [[maybe_unused]] size_t osize, size_t nsize) {
-  return realloc(ptr, nsize);
+    if (nsize == 0) {
+        free(ptr);
+        return NULL;
+    }
+    return realloc(ptr, nsize);
 }
 
 void setUp(void) {}
 
 void tearDown(void) {}
 
-void it_creates_new_vec(void) {
+void test_vec_new(void) {
   // arrange
   vec_int sut;
 
@@ -30,7 +34,7 @@ void it_creates_new_vec(void) {
   vec_int_free(sut);
 }
 
-void it_pushes_item_to_vec(void) {
+void test_vec_push(void) {
   // arrange
   vec_int sut = vec_int_new(test_alloc);
   int elem = 42;
@@ -47,7 +51,7 @@ void it_pushes_item_to_vec(void) {
   vec_int_free(sut);
 }
 
-void it_pops_item_from_vec(void) {
+void test_vec_pop(void) {
   // arrange
   vec_int sut = vec_int_new(test_alloc);
   int elem0 = 42, elem1 = 123, elem2 = -100500;
@@ -69,7 +73,7 @@ void it_pops_item_from_vec(void) {
   vec_int_free(sut);
 }
 
-void it_pushes_items_to_vec_until_it_grows(void) {
+void test_vec_push_until_grows(void) {
   // arrange
   vec_int sut = vec_int_new(test_alloc);
 

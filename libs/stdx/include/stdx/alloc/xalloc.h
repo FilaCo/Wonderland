@@ -11,9 +11,10 @@
  * functionality similar to `realloc`, but not exactly the same. The rules are
  * the following:
  *
- * 1. if `osize == 0`, then it MUST behave as the `malloc` function.
- * 2. if `nsize == 0`, then it MUST behave as the `free` function.
- * 3. else it MUST behave like the `realloc` function.
+ * - If `nsize == 0`, then it MUST behave as the `free` function.
+ * - If `nsize != 0`, then it MUST behave like the `realloc` function.
+ * - The allocator returns `NULL` if and only if it cannot fulfill the request.
+ * - Allocator should never fail when `osize >= nsize`.
  *
  * @param ctx user data
  * @param ptr a pointer to the block beeing allocated/reallocated/freed

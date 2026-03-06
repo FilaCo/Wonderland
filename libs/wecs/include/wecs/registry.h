@@ -14,4 +14,7 @@ void registry_free(registry reg);
 id registry_spawn(registry reg);
 void registry_despawn(registry reg, id id_);
 
+_Bool registry_is_alive(registry reg, id id_);
+_Bool registry_is_dead(registry reg, id id_);
+
 #endif // WECS_REGISTRY_H
