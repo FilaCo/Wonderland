@@ -9,6 +9,12 @@
 #include <vector>
 
 namespace Wonderland::ADT {
+/**
+ * @brief SparseMap<K, V> implementation.
+ *
+ * @tparam K
+ * @tparam V
+ */
 template <std::convertible_to<std::size_t> K, typename V> class SparseMap {
 public:
   void clear();
