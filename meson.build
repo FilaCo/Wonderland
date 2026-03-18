@@ -22,16 +22,16 @@ wonderland_exec = executable(
 )
 
 if get_option('enable-tests')
-    subdir('test')
+    subdir('tests')
 endif
 
 if get_option('enable-benchmarks')
-    subdir('benchmark')
+    subdir('benchmarks')
 endif
 
 subdir('docs')
 
-regex = '^((?!(benchmark|docs|subprojects|test)).)*$'
+regex = '^((?!(benchmarks|docs|subprojects|tests)).)*$'
 run_target(
     'lint',
     command: [

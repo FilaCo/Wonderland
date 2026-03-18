@@ -1,4 +1,4 @@
-#include "Wonderland/IPS/Registry.h"
+#include "Wonderland/IPS/Registry.hpp"
 #include <gtest/gtest.h>
 
 using namespace Wonderland::IPS;

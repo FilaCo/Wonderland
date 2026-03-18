@@ -1,8 +1,8 @@
 /**
  * @file Declares SparseMap<K, V>.
  */
-#ifndef WONDERLAND_ADT_SPARSEMAP_H
-#define WONDERLAND_ADT_SPARSEMAP_H
+#ifndef WONDERLAND_ADT_SPARSEMAP_HPP
+#define WONDERLAND_ADT_SPARSEMAP_HPP
 
 #include <concepts>
 #include <cstddef>
@@ -33,4 +33,4 @@ private:
 };
 } // namespace Wonderland::ADT
 
-#endif // WONDERLAND_ADT_SPARSEMAP_H
+#endif // WONDERLAND_ADT_SPARSEMAP_HPP
