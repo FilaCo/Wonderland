@@ -1,1 +1,1 @@
-wondlerland_src += files('Registry.cpp')
+wondlerland_src += files('Id.cpp', 'Registry.cpp')

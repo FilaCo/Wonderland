@@ -9,32 +9,21 @@ Id Registry::spawn() {
   return spawnImpl();
 }
 
-static const uint8_t IdPositionBits = 20;
-static const uint32_t IdPositionMask = (1u << IdPositionBits) - 1;
-
-static inline Id idNew(uint32_t Position, uint32_t Version) {
-  return Position | (Version << IdPositionBits);
-}
-
-static inline uint32_t idGetPosition(Id Id) { return Id & IdPositionMask; }
-
-static inline uint32_t idGetVersion(Id Id) { return Id >> IdPositionBits; }
-
 Id Registry::recycle() {
   // holder stores recycled id version
   auto PositionToRecycle = NextPosition;
   auto Holder = Ids[PositionToRecycle];
 
-  auto Recycled = idNew(PositionToRecycle, idGetVersion(Holder));
+  auto Recycled = Id(PositionToRecycle, Holder.Version);
 
   // restore invariants
-  NextPosition = idGetPosition(Holder);
+  NextPosition = Holder.Position;
   --Available;
 
   return Recycled;
 }
 Id Registry::spawnImpl() {
-  auto Spawned = idNew(NextPosition, 0);
+  auto Spawned = Id(NextPosition);
   Ids.push_back(Spawned);
 
   // restore invariants
@@ -43,10 +32,10 @@ Id Registry::spawnImpl() {
   return Spawned;
 }
 
-void Registry::despawn(Id Id) {
+void Registry::despawn(Id IdToDespawn) {
   // holder stores previous NextPosition and actual version of the Id
-  auto PositionToDespawn = idGetPosition(Id);
-  auto Holder = idNew(NextPosition, idGetVersion(Id) + 1);
+  auto PositionToDespawn = IdToDespawn.Position;
+  auto Holder = Id(NextPosition, IdToDespawn.Version + 1);
   Ids[PositionToDespawn] = Holder;
 
   // restore invariants
@@ -55,9 +44,9 @@ void Registry::despawn(Id Id) {
 }
 
 bool Registry::isAlive(Id Id) {
-  auto TargetPosition = idGetPosition(Id);
+  auto TargetPosition = Id.Position;
   return TargetPosition < Ids.size() &&
-         idGetVersion(Id) == idGetVersion(Ids[TargetPosition]);
+         Id.Version == Ids[TargetPosition].Version;
 }
 bool Registry::isDead(Id Id) { return !isAlive(Id); }
 

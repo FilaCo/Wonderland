@@ -1,5 +1,5 @@
 /**
- * @file Declares SparseMap<K, V>
+ * @file Declares SparseMap<K, V>.
  */
 #ifndef WONDERLAND_ADT_SPARSEMAP_H
 #define WONDERLAND_ADT_SPARSEMAP_H
@@ -12,7 +12,7 @@ namespace Wonderland::ADT {
 /**
  * @brief SparseMap<K, V> implementation.
  *
- * @tparam K
+ * @tparam K -
  * @tparam V
  */
 template <std::convertible_to<std::size_t> K, typename V> class SparseMap {
