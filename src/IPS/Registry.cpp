@@ -32,7 +32,7 @@ Id Registry::spawnImpl() {
   return Spawned;
 }
 
-void Registry::despawn(Id IdToDespawn) {
+void Registry::despawn(Id IdToDespawn) noexcept {
   // holder stores previous NextPosition and actual version of the Id
   auto PositionToDespawn = IdToDespawn.Position;
   auto Holder = Id(NextPosition, IdToDespawn.Version + 1);
@@ -43,11 +43,11 @@ void Registry::despawn(Id IdToDespawn) {
   ++Available;
 }
 
-bool Registry::isAlive(Id Id) {
+bool Registry::isAlive(Id Id) const {
   auto TargetPosition = Id.Position;
   return TargetPosition < Ids.size() &&
          Id.Version == Ids[TargetPosition].Version;
 }
-bool Registry::isDead(Id Id) { return !isAlive(Id); }
+bool Registry::isDead(Id Id) const { return !isAlive(Id); }
 
 } // namespace Wonderland::IPS

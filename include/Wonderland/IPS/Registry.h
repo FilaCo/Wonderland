@@ -8,9 +8,9 @@ namespace Wonderland::IPS {
 class Registry {
 public:
   Id spawn();
-  void despawn(Id IdToDespawn);
-  bool isAlive(Id Id);
-  bool isDead(Id Id);
+  void despawn(Id IdToDespawn) noexcept;
+  bool isAlive(Id Id) const;
+  bool isDead(Id Id) const;
 
 private:
   Id recycle();

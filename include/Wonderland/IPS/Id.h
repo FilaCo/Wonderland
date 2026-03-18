@@ -7,11 +7,14 @@
 namespace Wonderland::IPS {
 class Id {
 public:
-  operator size_t();
+  explicit Id(size_t RawId) noexcept;
+
+  operator size_t() const;
+  bool operator==(Id Other) const;
+  bool operator!=(Id Other) const;
 
 private:
-  explicit Id(uint32_t Position, uint32_t Version = 0)
-      : Position(Position), Version(Version) {}
+  explicit Id(uint32_t Position, uint32_t Version) noexcept;
 
   friend class Registry;
   uint32_t Position : 20;

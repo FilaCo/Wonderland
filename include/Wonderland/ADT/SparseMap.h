@@ -17,10 +17,10 @@ namespace Wonderland::ADT {
  */
 template <std::convertible_to<std::size_t> K, typename V> class SparseMap {
 public:
-  void clear();
+  void clear() noexcept;
 
 private:
-  K Size;
+  size_t Size;
   std::pmr::vector<K> Sparse;
   std::pmr::vector<K> Dense;
   std::pmr::vector<V> DenseValues;

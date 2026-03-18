@@ -6,7 +6,7 @@ using namespace Wonderland::IPS;
 TEST(RegistryTest, ItSpawnsEntity) {
   // arrange
   auto SUT = Registry();
-  auto Expected = 0;
+  auto Expected = Id(0);
 
   // act
   auto Actual = SUT.spawn();
@@ -39,16 +39,17 @@ TEST(RegistryTest, ItRecyclesEntities) {
     SUT.spawn();
   }
 
-  for (uint32_t i = 0; i < 10; i += 2) {
-    SUT.despawn(i);
+  for (auto i = 0; i < 10; i += 2) {
+    SUT.despawn(Id(i));
   }
 
   // assert
-  for (uint32_t i = 0; i < 10; ++i) {
-    EXPECT_EQ(i & 1, SUT.isAlive(i));
+  for (auto i = 0; i < 10; ++i) {
+    EXPECT_EQ(i & 1, SUT.isAlive(Id(i)));
   }
 
-  for (uint32_t i = 0; i < 10; i += 2) {
-    EXPECT_EQ((8 - i) | (1 << 20), SUT.spawn());
+  for (auto i = 0; i < 10; i += 2) {
+
+    EXPECT_EQ(Id((8 - i) | (1 << 20)), SUT.spawn());
   }
 }
