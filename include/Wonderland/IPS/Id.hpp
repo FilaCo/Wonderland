@@ -49,12 +49,13 @@ private:
 
   static constexpr uint8_t PositionBits = 20;
   static constexpr uint8_t VersionBits = 12;
+  static constexpr uint32_t MaxPosition = 1u << PositionBits;
   /**
    * @note As any `Id` instance consists of 2 parts: Version in `VersionBits`
    * older bits and `Position` in `PositionBits` remainder, then we need this
    * mask to extract the `Position` value.
    */
-  static constexpr uint32_t PositionMask = (1u << PositionBits) - 1;
+  static constexpr uint32_t PositionMask = MaxPosition - 1;
   /**
    * Reserved version after which we cannot recycle an `Id`.
    */

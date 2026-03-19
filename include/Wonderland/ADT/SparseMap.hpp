@@ -1,6 +1,3 @@
-/**
- * @file Declares SparseMap<K, V>.
- */
 #ifndef WONDERLAND_ADT_SPARSEMAP_HPP
 #define WONDERLAND_ADT_SPARSEMAP_HPP
 

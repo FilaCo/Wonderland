@@ -53,3 +53,59 @@ TEST(RegistryTest, ItRecyclesEntities) {
     EXPECT_EQ(Id((8 - i) | (1 << 20)), SUT.spawn());
   }
 }
+
+TEST(RegistryTest, ItDoesNotDespawnDeadEntities) {
+  // arrange
+  auto SUT = Registry();
+  auto Target = SUT.spawn();
+  SUT.despawn(Target);
+
+  // Only one increment of the version
+  auto ExpectedRecycled = Id(1 << 20);
+  auto ExpectedSpawned = Id(1);
+
+  // act
+  SUT.despawn(Target);
+  auto Recycled = SUT.spawn();
+  auto Spawned = SUT.spawn();
+
+  // assert
+  EXPECT_EQ(ExpectedRecycled, Recycled);
+  EXPECT_EQ(ExpectedSpawned, Spawned);
+}
+
+TEST(RegistryTest, StaleIsDeadAfterRecycle) {
+  // arrange
+  auto SUT = Registry();
+  auto Original = SUT.spawn();
+
+  // act
+  SUT.despawn(Original);
+  auto Recycled = SUT.spawn();
+
+  // assert
+  EXPECT_TRUE(SUT.isAlive(Recycled));
+  EXPECT_TRUE(SUT.isDead(Original));
+}
+
+TEST(RegistryTest, RecyclingCapabilityStressTest) {
+  // arrange
+  auto SUT = Registry();
+  auto Expected = Id(1);
+
+  // act
+  for (auto i = 0; i < 4095; ++i) {
+    SUT.despawn(SUT.spawn());
+  }
+  auto Actual = SUT.spawn();
+
+  // assert
+  EXPECT_EQ(Expected, Actual);
+}
+
+TEST(RegistryTest, IdsOutOfBoundsAreDead) {
+  // arrange
+  auto SUT = Registry();
+  auto Target = Id(1);
+  EXPECT_TRUE(SUT.isDead(Target));
+}
