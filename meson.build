@@ -7,12 +7,21 @@ project(
     license: 'MIT',
 )
 
+sdl3 = subproject('sdl3')
+sdl3_dep = sdl3.get_variable('sdl3_dep')
+
 wonderland_inc = [include_directories('include')]
-wondlerland_src = []
+wonderland_src = []
+wonderland_deps = [sdl3_dep]
 
 subdir('src')
 
-wonderland_static = static_library(meson.project_name(), wondlerland_src, include_directories: wonderland_inc)
+wonderland_static = static_library(
+    meson.project_name(),
+    wonderland_src,
+    include_directories: wonderland_inc,
+    dependencies: wonderland_deps,
+)
 
 wonderland_exec = executable(
     meson.project_name(),

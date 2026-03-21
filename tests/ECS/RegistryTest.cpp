@@ -1,4 +1,5 @@
 #include "Wonderland/ECS/Registry.hpp"
+#include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
 using namespace Wonderland::ECS;
