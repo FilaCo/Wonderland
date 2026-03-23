@@ -6,4 +6,7 @@
         "editor.defaultFormatter": "xaver.clang-format"
     },
     "mesonbuild.buildFolder": "build",
+    "antlr4.generation": {
+        "mode": "none"
+    }
 }
