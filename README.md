@@ -12,7 +12,6 @@ Wonderland is in the early stages of development. Important features are missing
 
 - **Focused:** Offer a complete 2D feature set (no 3D here).
 - **Fast:** App logic should run quickly and, when possible, in parallel.
-- **Specialized:** Alice for game logic, Hatter for UI and AI staff.
 
 ## License
 
