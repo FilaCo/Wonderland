@@ -14,7 +14,7 @@ threads_dep = dependency('threads')
 
 cmake = import('cmake')
 antlr4_rt_opts = cmake.subproject_options()
-antlr4_rt_opts.add_cmake_defines({'ANTLR_BUILD_CPP_TESTS': false, 'WITH_DEMO': false, 'ANTLR_BUILD_SHARED': false})
+antlr4_rt_opts.add_cmake_defines({'ANTLR_BUILD_CPP_TESTS': false, 'WITH_DEMO': false, 'ANTLR_BUILD_SHARED': false, 'DISABLE_WARNINGS': true})
 antlr4_rt = cmake.subproject('antlr4-runtime', options:antlr4_rt_opts)
 
 wonderland_inc = [include_directories('include')]
