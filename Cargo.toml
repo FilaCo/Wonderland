@@ -1,0 +1,7 @@
+[workspace]
+resolver = "3"
+members = ["alice", "hatter", "engine/*"]
+
+[workspace.dependencies]
+ariadne = { version = "0.6" }
+wonderland_ecs = { path = "engine/wonderland_ecs" }
