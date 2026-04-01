@@ -1,4 +1,6 @@
-use crate::{compiler::Config, source::SourceMap};
+use std::path::Path;
+
+use crate::{frontend::Config, source::SourceMap};
 
 #[derive(Debug)]
 pub struct Alice {
@@ -14,7 +16,7 @@ impl Alice {
         }
     }
 
-    pub fn input(&self) -> &str {
-        &self.cfg.input
+    pub fn input(&self) -> Option<&Path> {
+        self.cfg.input.as_deref()
     }
 }

@@ -1,4 +1,3 @@
-mod repl;
 mod run;
 mod state;
 
