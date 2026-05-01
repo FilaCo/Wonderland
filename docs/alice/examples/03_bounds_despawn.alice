@@ -1,0 +1,11 @@
+// 03 — Despawn
+
+prop Position {
+    x: float, 
+    y: float,
+}
+
+in Update
+query id: Id, pos: Position
+filter pos.y < 0
+despawn id

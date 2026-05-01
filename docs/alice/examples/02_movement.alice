@@ -1,0 +1,23 @@
+// 02 — Movement
+//
+// Demonstrates: the small Alice query
+
+prop Position {
+    x: float, 
+    y: float,
+}
+
+prop Velocity {
+    x: float,
+    y: float,
+}
+
+prop Player
+
+in Update
+query pos: Position, vel: Velocity
+with Player
+update {
+    pos.x += vel.x
+    pos.y += vel.y
+}
