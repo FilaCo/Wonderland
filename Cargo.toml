@@ -1,6 +1,6 @@
 [workspace]
 resolver = "3"
-members = ["alice/*", "engine/*", "hatter"]
+members = ["alice/*", "engine/*"]
 
 [workspace.dependencies]
 ac_db = { path = "alice/ac_db" }

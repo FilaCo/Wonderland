@@ -2,7 +2,7 @@
 
 ## What is Wonderland?
 
-Wonderland is a 2D game engine built in C++.
+TBD
 
 ## ⚠️ WARNING ⚠️
 
@@ -10,9 +10,8 @@ Wonderland is in the early stages of development. Important features are missing
 
 ## Design Goals
 
-- **Focused:** Offer a complete 2D feature set (no 3D here).
-- **Fast:** App logic should run quickly and, when possible, in parallel.
+TBD
 
 ## License
 
-Wonderland source code is licensed under MIT License ([LICENSE](./LICENSE) or http://opensource.org/licenses/MIT)
+Wonderland source code is licensed under MIT License ([LICENSE](./LICENSE) or <http://opensource.org/licenses/MIT>)
