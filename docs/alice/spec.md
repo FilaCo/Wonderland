@@ -20,7 +20,7 @@ Alice is a domain specific language (a.k.a DSL) designed for game and realtime s
 
 1. **Ids** (Entities in ECS terms) - opaque identifiers that can be referenced or compared on equality.
 2. **Props** (Components in ECS terms) - plain data structures whose values can be associated with an Id.
-3. **Systems** - user logic containers that can query props and mutate their values.
+3. **Queries** - user logic containers that can query props and mutate their values.
 
 The core idea behind Alice is that restricting developers to only these three ECS primitives naturally leads to software with the following characteristics out of the box:
 
@@ -105,7 +105,6 @@ ColonColon = "::" .
 
 Id        = "id" .
 Prop      = "prop" .
-Sys       = "sys" .
 Query     = "query" .
 Namespace = "namespace" .
 Const     = "const" .
@@ -114,15 +113,10 @@ Or        = "or" .
 Using     = "using" .
 Not       = "not" .
 Mut       = "mut" .
-If        = "if" .
-Else      = "else" .
-Match     = "match" .
-Select    = "select" .
-Filter    = "filter" .
-Derive    = "derive" .
 Insert    = "insert" .
 Spawn     = "spawn" .
 Despawn   = "despawn" .
+Update    = "update" .
 ```
 
 #### 1.2.3 Literals
@@ -215,7 +209,6 @@ AliceToken = BlockComment
            | ColonColon
            | Id
            | Prop
-           | Sys
            | Query
            | Namespace
            | Const
@@ -224,15 +217,10 @@ AliceToken = BlockComment
            | Using
            | Not
            | Mut
-           | If
-           | Else
-           | Match
-           | Select
            | Filter
-           | Derive
-           | Insert
            | Spawn
            | Despawn
+           | Update
            | IntLit
            | FloatLit
            | BoolLit
@@ -271,33 +259,6 @@ field_decls      = field_decl { "," field_decl } [ "," ] .
 field_decl       = Ident ":" ident_path .
 
 tuple_prop_decl = Ident "(" ident_path { "," ident_path } ")" .
-
-sys_decl = "sys" sys_body .
-sys_body = "{" { stage [semis] } "}" .
-
-stage = select_stage
-      | filter_stage
-      | derive_stage
-      | insert_stage
-      | erase_stage
-      | spawn_stage
-      | despawn_stage .
-
-select_stage    = "select" select_bindings .
-select_bindings = select_binding { "," select_binding } .
-select_binding  = [ Ident ":" ] ["mut"] ["?"] ident_path .
-
-filter_stage = "filter" expr .
-
-derive_stage = "derive" .
-
-insert_stage = "insert" .
-
-erase_stage = "erase" .
-
-spawn_stage = "spawn" .
-
-despawn_stage = "despawn" .
 
 const_decl = "const" Ident "=" expr .
 

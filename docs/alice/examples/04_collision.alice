@@ -1,0 +1,16 @@
+prop Position {
+    x: Float,
+    y: Float,
+}
+prop Collider {
+    radius: Float,
+}
+prop Health(int)
+
+query lhs: Position, lhs_col: Collider
+join rhs: Position, rhs_col: Collider
+unique
+filter distance(lhs, rhs) < lhs_col.radius + rhs_col.radius
+update {
+    // Handle collision
+}

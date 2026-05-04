@@ -1,7 +1,3 @@
-// 02 — Movement
-//
-// Demonstrates: the small Alice query
-
 prop Position {
     x: Float, 
     y: Float,

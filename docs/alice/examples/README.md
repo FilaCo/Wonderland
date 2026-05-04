@@ -9,3 +9,4 @@ Treat the syntax as a proposal — changing an example is cheaper than changing 
 | [01_types.alice](01_types.alice) | The four `prop` shapes: record, tuple, unit, enum. |
 | [02_movement.alice](02_movement.alice) | Per-frame iteration; mutating selected bindings. |
 | [03_bounds_despawn.alice](03_bounds_despawn.alice) | Filter expressions; `despawn` semantics. |
+| [04_collision.alice](04_collision.alice) | Entity pairs, collision detection, relationship queries. |

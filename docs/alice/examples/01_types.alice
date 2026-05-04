@@ -1,7 +1,3 @@
-// 01 — Type declarations
-//
-// Demonstrates: the four `prop` shapes (record, tuple, unit, enum).
-
 prop Position {
     x: Float, 
     y: Float,
@@ -12,3 +8,5 @@ prop Health(int)
 prop Player
 
 prop Direction = North | South | East | West
+
+const G = 9.8
