@@ -3,8 +3,8 @@
 // Demonstrates: the four `prop` shapes (record, tuple, unit, enum).
 
 prop Position {
-    x: float, 
-    y: float,
+    x: Float, 
+    y: Float,
 }
 
 prop Health(int)

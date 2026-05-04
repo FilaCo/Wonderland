@@ -1,8 +1,8 @@
 // 03 — Despawn
 
 prop Position {
-    x: float, 
-    y: float,
+    x: Float, 
+    y: Float,
 }
 
 in Update

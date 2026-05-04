@@ -3,13 +3,13 @@
 // Demonstrates: the small Alice query
 
 prop Position {
-    x: float, 
-    y: float,
+    x: Float, 
+    y: Float,
 }
 
 prop Velocity {
-    x: float,
-    y: float,
+    x: Float,
+    y: Float,
 }
 
 prop Player
