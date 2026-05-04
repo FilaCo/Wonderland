@@ -8,7 +8,6 @@ When in doubt, refer back to these principles. If a feature contradicts them, th
 ECS is the language, not a pattern.
 Data and behavior are separate.
 Composition over inheritance. Always.
-Explicit is better than implicit.
 Flat hierarchies beat deep nesting.
 Minimal boilerplate is a feature.
 Readability emerges from simplicity.
@@ -16,7 +15,5 @@ Performance comes from structure, not optimization.
 Constraints enable freedom.
 There should be one obvious way to do it.
 Mutations are declared, not discovered.
-Filters separate concerns from logic.
 The mental model stays small.
-Avoid syntactic sugar that hides data flow.
 ```

@@ -22,7 +22,7 @@ prop Player
  */
 in Update
 query pos: Position, vel: Velocity
-with Player
+filter has(Player)
 update {
     pos.x += vel.x
     pos.y += vel.y

@@ -13,11 +13,12 @@ prop Position {
 prop Health(Int)
 prop Coordinate(Float, Float)
 
-// Unit prop: a marker component with no data, used for tagging entities
+// Unit prop: a marker component with no data, used for tagging ids
 prop Player
 
 // Enum prop: a sum type with named variants
-prop Direction = North | South | East | West
+prop Color = Red | Green | Blue
+prop Diagnostic = Error | Warning | Notice | Custom(Color)
 
 // Const: a compile-time constant value
 const G = 9.8
