@@ -1,3 +1,8 @@
+/**
+ * This file demonstrates collision detection between entities.
+ * Uses 'join' to iterate over all pairs of entities with colliders.
+ */
+
 prop Position {
     x: Float,
     y: Float,
@@ -5,8 +10,17 @@ prop Position {
 prop Collider {
     radius: Float,
 }
-prop Health(int)
+prop Health(Int)
 
+/**
+ * Self-join query for collision pairs:
+ * - 'join' creates a second iteration over the same components
+ * - 'unique' ensures each pair is processed once (A-B, not B-A too)
+ * - 'filter' checks if circles overlap
+ *
+ * Note: The distance() function is aspirational. User-defined functions
+ * and field access expressions are still TBD in the language design.
+ */
 query lhs: Position, lhs_col: Collider
 join rhs: Position, rhs_col: Collider
 unique

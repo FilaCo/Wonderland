@@ -1,12 +1,23 @@
+/**
+ * This file demonstrates the different kinds of property (prop) declarations
+ * and constant definitions in Alice.
+ */
+
+// Record prop: a struct with named fields (components in ECS terms)
 prop Position {
     x: Float, 
     y: Float,
 }
 
-prop Health(int)
+// Tuple prop: props with unnamed fields (parenthesized types)
+prop Health(Int)
+prop Coordinate(Float, Float)
 
+// Unit prop: a marker component with no data, used for tagging entities
 prop Player
 
+// Enum prop: a sum type with named variants
 prop Direction = North | South | East | West
 
+// Const: a compile-time constant value
 const G = 9.8

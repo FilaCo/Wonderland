@@ -1,3 +1,8 @@
+/**
+ * This file demonstrates a basic movement system using queries.
+ * Entities with Position, Velocity, and Player are updated each frame.
+ */
+
 prop Position {
     x: Float, 
     y: Float,
@@ -10,6 +15,11 @@ prop Velocity {
 
 prop Player
 
+/**
+ * Query that runs in the Update schedule:
+ * - Binds Position to 'pos' and Velocity to 'vel'
+ * - 'with Player' filters to entities that also have the Player component
+ */
 in Update
 query pos: Position, vel: Velocity
 with Player
