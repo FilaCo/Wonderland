@@ -39,7 +39,12 @@ syntax      = { production } .
 production  = ProductionName "=" [ expression ] "." .
 expression  = term { "|" term } .
 term        = factor { factor } .
-factor      = ProductionName | Token [ "…" Token ] | group | option | repetition .
+factor      = ProductionName 
+            | Token [ "…" Token ] 
+            | group 
+            | option 
+            | repetition .
+
 group       = "(" expression ")" .
 option      = "[" expression "]" .
 repetition  = "{" expression "}" .
@@ -164,12 +169,12 @@ BinDigits = BinDigit { [ "_" ] BinDigit } .
 OctDigits = OctDigit { [ "_" ] OctDigit } .
 HexDigits = HexDigit { [ "_" ] HexDigit } .
 
-DecLit = "0" | ("1" … "9") [ [ "_" ] DecDigits ] .
-BinLit = "0" ( "b" | "B" ) [ "_" ] BinDigits .
-OctLit = "0" [ "o" | "O" ] [ "_" ] OctDigits .
-HexLit = "0" ( "x" | "X" ) [ "_" ] HexDigits .
+DecLit    = "0" | ( "1" … "9" ) [ [ "_" ] DecDigits ] .
+BinLit    = "0" ( "b" | "B" ) [ "_" ] BinDigits .
+OctLit    = "0" [ "o" | "O" ] [ "_" ] OctDigits .
+HexLit    = "0" ( "x" | "X" ) [ "_" ] HexDigits .
 
-IntLit = DecLit | BinLit | OctLit | HexLit .
+IntLit    = DecLit | BinLit | OctLit | HexLit .
 ```
 
 ```text
@@ -214,7 +219,7 @@ HexMantissa = [ "_" ] HexDigits "." [ HexDigits ]
 
 HexFloatLit = "0" ( "x" | "X" ) HexMantissa HexExponent .
 
-FloatLit = DecFloatLit | HexFloatLit .
+FloatLit    = DecFloatLit | HexFloatLit .
 ```
 
 ```text
@@ -263,4 +268,94 @@ Although these representations all result in an integer, they have different val
 
 After a backslash, certain single-character escapes represent special values:
 
+```text
+\a   U+0007 alert or bell
+\b   U+0008 backspace
+\f   U+000C form feed
+\n   U+000A line feed or newline
+\r   U+000D carriage return
+\t   U+0009 horizontal tab
+\v   U+000B vertical tab
+\\   U+005C backslash
+\'   U+0027 single quote  (valid escape only within rune literals)
+\"   U+0022 double quote  (valid escape only within string literals)
+```
+
+An unrecognized character following a backslash in a rune literal is illegal.
+
+```ebnf
+EscapedChar = `\` ( "a" | "b" | "f" | "n" | "r" | "t" | "v" | `\` | "'" | `"` ) .
+
+BigUValue   = `\` "U" HexDigit HexDigit HexDigit HexDigit
+                    HexDigit HexDigit HexDigit HexDigit .
+LittleUValue = `\` "u" HexDigit HexDigit HexDigit HexDigit .
+HexByteValue = `\` "x" HexDigit HexDigit .
+OctalByteValue = `\` OctalDigit OctalDigit OctalDigit .
+ByteValue = OctalByteValue | HexByteValue .
+UnicodeValue = UnicodeChar | LittleUValue | BigUValue | EscapedChar .
+
+RuneLit = "'" ( UnicodeValue | ByteValue ) "'" .
+```
+
+```text
+'a'
+'ä'
+'本'
+'\t'
+'\000'
+'\007'
+'\377'
+'\x07'
+'\xff'
+'\u12e4'
+'\U00101234'
+'\''         // rune literal containing single quote character
+'aa'         // illegal: too many characters
+'\k'         // illegal: k is not recognized after a backslash
+'\xa'        // illegal: too few hexadecimal digits
+'\0'         // illegal: too few octal digits
+'\400'       // illegal: octal value over 255
+'\uDFFF'     // illegal: surrogate half
+'\U00110000' // illegal: invalid Unicode code point
+```
+
 ### String literals
+
+A string literal represents a string constant obtained from concatenating a sequence of characters. There are two forms: raw string literals and interpreted string literals.
+
+Raw string literals are character sequences between two sequences of three double quotes, as in `"""foo"""`. Within the quotes, any character may appear except another triple double quotes. The value of a raw string literal is the string composed of the uninterpreted (implicitly UTF-8-encoded) characters between the quotes; in particular, backslashes have no special meaning and the string may contain newlines. Carriage return characters (`\r`) inside raw string literals are discarded from the raw string value.
+
+Interpreted string literals are character sequences between double quotes, as in `"bar"`. Within the quotes, any character may appear except newline and unescaped double quote. The text between the quotes forms the value of the literal, with backslash escapes interpreted as they are in rune literals (except that `\'` is illegal and `\"` is legal), with the same restrictions. The three-digit octal (`\nnn`) and two-digit hexadecimal (`\xnn`) escapes represent individual bytes of the resulting string; all other escapes represent the (possibly multi-byte) UTF-8 encoding of individual characters. Thus inside a string literal `\377` and `\xFF` represent a single byte of value `0xFF=255`, while `ÿ`, `\u00FF`, `\U000000FF` and `\xc3\xbf` represent the two bytes `0xc3 0xbf` of the UTF-8 encoding of character `U+00FF`.
+
+```ebnf
+RawStringLit         = `"""` { UnicodeChar | "\n" } `"""` .
+InterpretedStringLit = `"` { UnicodeValue | ByteValue } `"` .
+
+StringLit            = RawStringLit | InterpretedStringLit .
+```
+
+```text
+"""abc"""            // same as "abc"
+"""\n
+\n"""                // same as "\\n\n\\n"
+"\n"
+"\""                 // same as """""""
+"Hello, world!\n"
+"日本語"
+"\u65e5本\U00008a9e"
+"\xff\u00FF"
+"\uD800"             // illegal: surrogate half
+"\U00110000"         // illegal: invalid Unicode code point
+```
+
+These examples all represent the same string:
+
+```text
+"日本語"                                 // UTF-8 input text
+"""日本語"""                             // UTF-8 input text as a raw literal
+"\u65e5\u672c\u8a9e"                    // the explicit Unicode code points
+"\U000065e5\U0000672c\U00008a9e"        // the explicit Unicode code points
+"\xe6\x97\xa5\xe6\x9c\xac\xe8\xaa\x9e"  // the explicit UTF-8 bytes
+```
+
+If the source code represents a character as two code points, such as a combining form involving an accent and a letter, the result will be an error if placed in a rune literal (it is not a single code point), and will appear as two code points if placed in a string literal.
