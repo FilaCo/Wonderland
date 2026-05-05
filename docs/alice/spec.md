@@ -276,24 +276,24 @@ After a backslash, certain single-character escapes represent special values:
 \t   U+0009 horizontal tab
 \v   U+000B vertical tab
 \\   U+005C backslash
-\'   U+0027 single quote  (valid escape only within rune literals)
-\"   U+0022 double quote  (valid escape only within string literals)
+\'   U+0027 single quote  (valid escape only within rune and byte literals)
+\"   U+0022 double quote  (valid escape only within string and byte string literals)
 ```
 
 An unrecognized character following a backslash in a rune literal is illegal.
 
 ```ebnf
-EscapedChar = `\` ( "a" | "b" | "f" | "n" | "r" | "t" | "v" | `\` | "'" | `"` ) .
+EscapedChar    = `\` ( "a" | "b" | "f" | "n" | "r" | "t" | "v" | `\` | "'" | `"` ) .
 
-BigUValue   = `\` "U" HexDigit HexDigit HexDigit HexDigit
+BigUValue      = `\` "U" HexDigit HexDigit HexDigit HexDigit
                     HexDigit HexDigit HexDigit HexDigit .
-LittleUValue = `\` "u" HexDigit HexDigit HexDigit HexDigit .
-HexByteValue = `\` "x" HexDigit HexDigit .
+LittleUValue   = `\` "u" HexDigit HexDigit HexDigit HexDigit .
+HexByteValue   = `\` "x" HexDigit HexDigit .
 OctalByteValue = `\` OctalDigit OctalDigit OctalDigit .
-ByteValue = OctalByteValue | HexByteValue .
-UnicodeValue = UnicodeChar | LittleUValue | BigUValue | EscapedChar .
+ByteValue      = OctalByteValue | HexByteValue .
+UnicodeValue   = UnicodeChar | LittleUValue | BigUValue | EscapedChar .
 
-RuneLit = "'" ( UnicodeValue | ByteValue ) "'" .
+RuneLit        = "'" ( UnicodeValue | ByteValue ) "'" .
 ```
 
 ```text
