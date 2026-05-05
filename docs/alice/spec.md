@@ -17,6 +17,7 @@
   - [Imaginary literals](#imaginary-literals)
   - [Rune literals](#rune-literals)
   - [String literals](#string-literals)
+- [Constants](#constants)
 
 ## Introduction
 
@@ -74,6 +75,7 @@ Each code point is distinct; for instance, uppercase and lowercase letters are d
 The following terms are used to denote specific Unicode character categories:
 
 ```ebnf
+NewLine       = /* the Unicode code point U+000A */ .
 UnicodeChar   = /* an arbitrary Unicode code point except U+000A and U+000D */ .
 UnicodeLetter = /* a Unicode code point categorized as "Letter" */ .
 UnicodeDigit  = /* a Unicode code point categorized as "Number, decimal digit" */ .
@@ -321,14 +323,14 @@ RuneLit = "'" ( UnicodeValue | ByteValue ) "'" .
 
 ### String literals
 
-A string literal represents a string constant obtained from concatenating a sequence of characters. There are two forms: raw string literals and interpreted string literals.
+A string literal represents a [string constant](#constants) obtained from concatenating a sequence of characters. There are two forms: raw string literals and interpreted string literals.
 
 Raw string literals are character sequences between two sequences of three double quotes, as in `"""foo"""`. Within the quotes, any character may appear except another triple double quotes. The value of a raw string literal is the string composed of the uninterpreted (implicitly UTF-8-encoded) characters between the quotes; in particular, backslashes have no special meaning and the string may contain newlines. Carriage return characters (`\r`) inside raw string literals are discarded from the raw string value.
 
 Interpreted string literals are character sequences between double quotes, as in `"bar"`. Within the quotes, any character may appear except newline and unescaped double quote. The text between the quotes forms the value of the literal, with backslash escapes interpreted as they are in rune literals (except that `\'` is illegal and `\"` is legal), with the same restrictions. The three-digit octal (`\nnn`) and two-digit hexadecimal (`\xnn`) escapes represent individual bytes of the resulting string; all other escapes represent the (possibly multi-byte) UTF-8 encoding of individual characters. Thus inside a string literal `\377` and `\xFF` represent a single byte of value `0xFF=255`, while `ÿ`, `\u00FF`, `\U000000FF` and `\xc3\xbf` represent the two bytes `0xc3 0xbf` of the UTF-8 encoding of character `U+00FF`.
 
 ```ebnf
-RawStringLit         = `"""` { UnicodeChar | "\n" } `"""` .
+RawStringLit         = `"""` { UnicodeChar | NewLine } `"""` .
 InterpretedStringLit = `"` { UnicodeValue | ByteValue } `"` .
 
 StringLit            = RawStringLit | InterpretedStringLit .
@@ -359,3 +361,15 @@ These examples all represent the same string:
 ```
 
 If the source code represents a character as two code points, such as a combining form involving an accent and a letter, the result will be an error if placed in a rune literal (it is not a single code point), and will appear as two code points if placed in a string literal.
+
+## Constants
+
+There are *boolean constants*, *rune constants*, *integer constants*, *floating-point constants*, and *string constants*. Rune, integer, and floating-point constants are collectively called *numeric constants*.
+
+A constant value is represented by a [rune](#rune-literals), [integer](#integer-literals), [floating-point](#floating-point-literals), or [string](#string-literals) literal, an identifier denoting a constant, a constant expression, a conversion with a result that is a constant. The boolean truth values are represented by the predeclared constants `true` and `false`.
+
+Rune constants are 32-bit unsigned values. Integer constants are 64-bit signed values. Floating-point constants are IEEE 754 double-precision (64-bit) values.
+
+A constant may have an explicitly declared type, or its type is inferred from the initializer. It is an error if the constant value cannot be represented as a value of the respective type.
+
+Untyped numeric constants assume a default type when a type is required: `int` for integer constants, `float` for floating-point constants, and `rune` for rune constants.
