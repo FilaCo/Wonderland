@@ -14,9 +14,10 @@
   - [Operators and punctuation](#operators-and-punctuation)
   - [Integer literals](#integer-literals)
   - [Floating-point literals](#floating-point-literals)
-  - [Imaginary literals](#imaginary-literals)
   - [Rune literals](#rune-literals)
   - [String literals](#string-literals)
+  - [Byte literals](#byte-literals)
+  - [Byte string literals](#byte-string-literals)
 - [Constants](#constants)
 
 ## Introduction
@@ -254,10 +255,6 @@ FloatLit    = DecFloatLit | HexFloatLit .
 1.5e1_       // invalid: _ must separate successive digits
 ```
 
-### Imaginary literals
-
-TBD
-
 ### Rune literals
 
 A rune literal represents a rune constant, an integer value identifying a Unicode code point. A rune literal is expressed as one or more characters enclosed in single quotes, as in `'x'` or `'\n'`. Within the quotes, any character may appear except newline and unescaped single quote. A single quoted character represents the Unicode value of the character itself, while multi-character sequences beginning with a backslash encode values in various formats.
@@ -327,11 +324,11 @@ A string literal represents a [string constant](#constants) obtained from concat
 
 Raw string literals are character sequences between two sequences of three double quotes, as in `"""foo"""`. Within the quotes, any character may appear except another triple double quotes. The value of a raw string literal is the string composed of the uninterpreted (implicitly UTF-8-encoded) characters between the quotes; in particular, backslashes have no special meaning and the string may contain newlines. Carriage return characters (`\r`) inside raw string literals are discarded from the raw string value.
 
-Interpreted string literals are character sequences between double quotes, as in `"bar"`. Within the quotes, any character may appear except newline and unescaped double quote. The text between the quotes forms the value of the literal, with backslash escapes interpreted as they are in rune literals (except that `\'` is illegal and `\"` is legal), with the same restrictions. The three-digit octal (`\nnn`) and two-digit hexadecimal (`\xnn`) escapes represent individual bytes of the resulting string; all other escapes represent the (possibly multi-byte) UTF-8 encoding of individual characters. Thus inside a string literal `\377` and `\xFF` represent a single byte of value `0xFF=255`, while `ÿ`, `\u00FF`, `\U000000FF` and `\xc3\xbf` represent the two bytes `0xc3 0xbf` of the UTF-8 encoding of character `U+00FF`.
+Interpreted string literals are character sequences between double quotes, as in `"bar"`. Within the quotes, any character may appear except newline and unescaped double quote. The text between the quotes forms the value of the literal, with backslash escapes interpreted as they are in rune literals (except that `\'` is illegal and `\"` is legal), with the same restrictions. String literals always contain valid UTF-8 encoded text; only Unicode-level escapes (`\u` and `\U`) are allowed to specify code points, not byte-level escapes.
 
 ```ebnf
 RawStringLit         = `"""` { UnicodeChar | NewLine } `"""` .
-InterpretedStringLit = `"` { UnicodeValue | ByteValue } `"` .
+InterpretedStringLit = `"` { UnicodeValue } `"` .
 
 StringLit            = RawStringLit | InterpretedStringLit .
 ```
@@ -345,7 +342,6 @@ StringLit            = RawStringLit | InterpretedStringLit .
 "Hello, world!\n"
 "日本語"
 "\u65e5本\U00008a9e"
-"\xff\u00FF"
 "\uD800"             // illegal: surrogate half
 "\U00110000"         // illegal: invalid Unicode code point
 ```
@@ -353,23 +349,79 @@ StringLit            = RawStringLit | InterpretedStringLit .
 These examples all represent the same string:
 
 ```text
-"日本語"                                 // UTF-8 input text
-"""日本語"""                             // UTF-8 input text as a raw literal
-"\u65e5\u672c\u8a9e"                    // the explicit Unicode code points
-"\U000065e5\U0000672c\U00008a9e"        // the explicit Unicode code points
-"\xe6\x97\xa5\xe6\x9c\xac\xe8\xaa\x9e"  // the explicit UTF-8 bytes
+"日本語"                         // UTF-8 input text
+"""日本語"""                     // UTF-8 input text as a raw literal
+"\u65e5\u672c\u8a9e"            // the explicit Unicode code points
+"\U000065e5\U0000672c\U00008a9e" // the explicit Unicode code points
 ```
 
 If the source code represents a character as two code points, such as a combining form involving an accent and a letter, the result will be an error if placed in a rune literal (it is not a single code point), and will appear as two code points if placed in a string literal.
 
+### Byte literals
+
+A byte literal represents a byte constant, an unsigned 8-bit integer value. A byte literal is expressed as the character `b` followed by a single character or escape sequence enclosed in single quotes, as in `b'x'` or `b'\n'`. Within the quotes, any character may appear except newline and unescaped single quote.
+
+The simplest form represents the single byte value of the character within the quotes. For instance, the literal `b'a'` holds the value 0x61 (97 in decimal). Multi-byte UTF-8 sequences are not allowed in byte literals.
+
+The same backslash escapes are available as in rune literals, but the result is always a single byte value. Octal escapes must represent a value between 0 and 255 inclusive. Hexadecimal escapes represent a single byte. The escapes `\u` and `\U` are not allowed in byte literals since they may represent values larger than 255 or multi-byte sequences.
+
+```ebnf
+ByteLit = "b" "'" ( UnicodeChar | HexByteValue | OctalByteValue | EscapedChar ) "'" .
+```
+
+```text
+b'a'
+b'~'
+b'\n'
+b'\x00'
+b'\xff'
+b'\255'
+b'\''         // byte literal containing single quote character
+
+b'aa'         // illegal: too many characters
+b'ä'          // illegal: multi-byte UTF-8 sequence
+b'\u0061'     // illegal: \u escapes not allowed in byte literals
+b'\U00000061' // illegal: \U escapes not allowed in byte literals
+b'\x1'        // illegal: too few hexadecimal digits
+b'\256'       // illegal: octal value over 255
+```
+
+### Byte string literals
+
+A byte string literal represents a constant obtained from concatenating a sequence of bytes. A byte string literal is a character sequence preceded by `b` and enclosed in double quotes, as in `b"foo"`. Within the quotes, any character may appear except newline and unescaped double quote. The text between the quotes forms the value of the literal, with backslash escapes interpreted as they are in rune literals (except that `\'` and `\u`/`\U` escapes are illegal), with the same restrictions. The three-digit octal (`\nnn`) and two-digit hexadecimal (`\xnn`) escapes represent individual bytes of the resulting byte string.
+
+```ebnf
+ByteStringLit = "b" `"` { UnicodeChar | ByteValue | EscapedChar } `"` .
+```
+
+```text
+b"abc"
+b"\n"
+b"\""
+b"Hello, world!\n"
+b"\xff\x00\x7f"
+b"\377"
+
+b"\uD800"            // illegal: \u escapes not allowed in byte string literals
+b"\U00110000"        // illegal: \U escapes not allowed in byte string literals
+b"\u0061"            // illegal: \u escapes not allowed in byte string literals
+```
+
+These examples all represent the same byte string:
+
+```text
+b"hello"
+b"\x68\x65\x6c\x6c\x6f"
+```
+
 ## Constants
 
-There are *boolean constants*, *rune constants*, *integer constants*, *floating-point constants*, and *string constants*. Rune, integer, and floating-point constants are collectively called *numeric constants*.
+There are *boolean constants*, *rune constants*, *integer constants*, *floating-point constants*, *string constants*, *byte constants*, and *byte string constants*. Rune, integer, floating-point, and byte constants are collectively called *numeric constants*.
 
-A constant value is represented by a [rune](#rune-literals), [integer](#integer-literals), [floating-point](#floating-point-literals), or [string](#string-literals) literal, an identifier denoting a constant, a constant expression, a conversion with a result that is a constant. The boolean truth values are represented by the predeclared constants `true` and `false`.
+A constant value is represented by a [rune](#rune-literals), [integer](#integer-literals), [floating-point](#floating-point-literals), [string](#string-literals), [byte](#byte-literals), or [byte string](#byte-string-literals) literal, an identifier denoting a constant, a constant expression, or a conversion with a result that is a constant. The boolean truth values are represented by the predeclared constants `true` and `false`.
 
-Rune constants are 32-bit unsigned values. Integer constants are 64-bit signed values. Floating-point constants are IEEE 754 double-precision (64-bit) values.
+Rune constants are 32-bit signed values representing Unicode code points from 0 to 0x10FFFF. The signed type allows sentinel values such as -1 at runtime. Integer constants are 64-bit signed values. Floating-point constants are IEEE 754 double-precision (64-bit) values. Byte constants are unsigned 8-bit values. String constants are immutable sequences of Unicode code points encoded as UTF-8. Byte string constants are immutable sequences of arbitrary bytes.
 
 A constant may have an explicitly declared type, or its type is inferred from the initializer. It is an error if the constant value cannot be represented as a value of the respective type.
 
-Untyped numeric constants assume a default type when a type is required: `int` for integer constants, `float` for floating-point constants, and `rune` for rune constants.
+Untyped numeric constants assume a default type when a type is required: `int` for integer constants, `float` for floating-point constants, `rune` for rune constants, and `byte` for byte constants.
