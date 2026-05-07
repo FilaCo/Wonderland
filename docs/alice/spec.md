@@ -152,15 +152,18 @@ GE         = ">=" .
 LE         = "<=" .
 
 Const     = "const" .
+Derive    = "derive" .
 Despawn   = "despawn" .
+Erase     = "erase" .
 Filter    = "filter" .
+In        = "in" .
+Match     = "match" .
 Mut       = "mut" .
-Namespace = "namespace" .
 Prop      = "prop" .
 Query     = "query" .
 Spawn     = "spawn" .
-Using     = "using" .
 With      = "with" .
+Without   = "without" .
 ```
 
 #### Literals
@@ -322,15 +325,18 @@ AliceToken = BlockComment
            | GE
            | LE
            | Const
+           | Derive
            | Despawn
+           | Erase
            | Filter
+           | In
+           | Match
            | Mut
-           | Namespace
            | Prop
            | Query
            | Spawn
-           | Using
            | With
+           | Without
            | BoolLit
            | RawIdent
            | Ident
@@ -347,14 +353,11 @@ The grammar below replaces some lexical grammar rules with explicit literals (wh
 ```ebnf
 alice_file = { top_level_obj [ semis ] } EOF .
 
-top_level_obj = using_stmt
+top_level_obj = sys_stmt
               | decl .
 
-using_stmt = "using" ident_path .
-
 decl = prop_decl
-     | const_decl
-     | namespace_decl .
+     | const_decl .
 
 prop_decl      = "prop" ident [ prop_body ] .
 prop_body      = enum_prop_body
@@ -363,18 +366,15 @@ prop_body      = enum_prop_body
 
 enum_prop_body = "=" enum_ctors .
 enum_ctors     = enum_ctor { "|" enum_ctor } .
-enum_ctor      = ident [ "(" ident_path { "," ident_path } ")" ] .
+enum_ctor      = ident [ "(" ident { "," ident } ")" ] .
 
 record_prop_body = "{" field_decls "}" .
 field_decls      = field_decl { "," field_decl } [ "," ] .
-field_decl       = ident ":" ident_path .
+field_decl       = ident ":" ident .
 
-tuple_prop_body = "(" ident_path { "," ident_path } ")" .
+tuple_prop_body = "(" ident { "," ident } ")" .
 
-const_decl = "const" ident [ ":" ident_path ] "=" expression .
-
-namespace_decl  = "namespace" ident_path namespace_scope .
-namespace_scope = "{" { top_level_obj [semis] } "}" .
+const_decl = "const" ident [ ":" ident ] "=" expression .
 
 expression  = disjunction .
 disjunction = conjunction { "||" conjunction } .
@@ -384,10 +384,10 @@ comparison  = term { ( "<" | ">" | "<=" | ">=" ) term } .
 term        = factor { ( "+" | "-" ) factor } .
 factor      = unary { ( "*" | "/" ) unary } .
 unary       = ( "!" | "-" ) unary | primary .
-primary     = literal | "(" expression ")" .
+primary     = reference | literal | "(" expression ")" .
+reference   = ident .
 literal     = BoolLit | IntLit | FloatLit .
 
-ident_path = ["::"] ident { "::" ident } .
 ident      = RawIdent | Ident .
 
 semis = ";" | NL { ";" | NL } .

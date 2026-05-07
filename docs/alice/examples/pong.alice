@@ -1,0 +1,41 @@
+2d!
+
+in Startup {
+    spawn {
+        // comes from std
+        Camera,
+        // comes from std
+        // default! is an intrinsic that uses default values to initialize a prop value
+        Transform::default!()
+    }
+}
+
+prop Ball
+
+in Startup {
+    spawn {
+        Ball,
+        Transform::default!()
+    }
+}
+
+prop Player = First | Second
+prop Paddle
+
+in Startup {
+    query w: Window
+    derive padding = 20.
+    derive half_window_size = w.resolution.size / 2
+    spawn {
+        // Player::First
+        First,
+        Paddle,
+        Transform { x: -half_window_size.x + padding, y: 0., ..default!() }
+    }
+    spawn {
+        // Player::Second
+        Second,
+        Paddle,
+        Transform { x: half_window_size.x - padding, y: 0., ..default!() }
+    }
+}
