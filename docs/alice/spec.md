@@ -356,6 +356,8 @@ alice_file = { top_level_obj [ semis ] } EOF .
 top_level_obj = sys_stmt
               | decl .
 
+sys_stmt = "in" ident "{" "}" .
+
 decl = prop_decl
      | const_decl .
 
@@ -369,7 +371,7 @@ enum_ctors     = enum_ctor { "|" enum_ctor } .
 enum_ctor      = ident [ "(" ident { "," ident } ")" ] .
 
 record_prop_body = "{" field_decls "}" .
-field_decls      = field_decl { "," field_decl } [ "," ] .
+field_decls      = field_decl { [ semis ] field_decl } [ semis ] .
 field_decl       = ident ":" ident .
 
 tuple_prop_body = "(" ident { "," ident } ")" .
