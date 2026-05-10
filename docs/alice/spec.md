@@ -367,34 +367,34 @@ EOF        = /* end of input */ .
 The grammar below replaces some lexical grammar rules with explicit literals (where such replacement in trivial and always correct, for example, for keywords) for better readability.
 
 ```ebnf
-alice_file = {top_level_obj} EOF .
+alice_file = {NL} {stmt semi} EOF .
 
-top_level_obj = (top_level_stmt|top_level_decl) [semis] .
+stmt = assign_stmt
+     | use_stmt
+     | decl .
 
-top_level_stmt = use_stmt .
+assign_stmt = [modifier] simple_ident "=" expr .
+use_stmt = "use" ident ["::" "*"] .
 
-use_stmt       = "use" ident ["::" "*"] .
-
-top_level_decl = const_decl
-               | mod_decl
-               | prop_decl
-               | sys_decl .
+decl = const_decl
+     | mod_decl
+     | prop_decl
+     | sys_decl .
 
 const_decl = "const" simple_ident [type_anno] "=" expr .
 
-mod_decl  = "mod" simple_ident [mod_body] .
-mod_body  = "{" {top_level_obj} "}" .
+mod_decl  = "mod" simple_ident [[NL] mod_body] .
+mod_body  = "{" {NL} {top_level_obj} {NL} "}" .
 
 prop_decl      = "prop" simple_ident [prop_body] .
 prop_body      = enum_prop_body
-               | record_prop_body
+               | ([NL] record_prop_body)
                | tuple_prop_body .
 
-enum_prop_body = "=" enum_ctor {[NL] "|" enum_ctor} .
-enum_ctor      = simple_ident ["(" types_list ")"] .
+enum_prop_body = "=" [NL] enum_ctor {[NL] "|" enum_ctor} .
+enum_ctor      = simple_ident ["(" {NL} type {"," {NL} type} ")"] .
 
-record_prop_body = "{" field_decls "}" .
-field_decls      = field_decl { [semis] field_decl } [semis] .
+record_prop_body = "{" {NL} {field_decl} "}" .
 field_decl       = simple_ident ":" type .
 
 tuple_prop_body = "(" types_list ")" .
@@ -441,6 +441,6 @@ type         = ["?"] ident .
 ident        = simple_ident {"::" simple_ident} .
 simple_ident = RawIdent|Ident .
 
-semis = ";"|NL {";"|NL} .
-semi  = (";"|NL) {NL} .
+semi        = (";"|NL) {NL} .
+pipe_gt_sep = ("|>"|NL) {NL} .
 ```
