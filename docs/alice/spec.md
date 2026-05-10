@@ -36,12 +36,12 @@ The core idea behind Alice is that restricting developers to only these three EC
 The syntax is specified using a [variant](https://en.wikipedia.org/wiki/Wirth_syntax_notation) of Extended Backus-Naur Form (EBNF):
 
 ```ebnf
-syntax      = {production} .
-production  = ProductionName "=" [expression] "." .
-expression  = term {"|" term} .
-term        = factor {factor} .
+syntax      = { production } .
+production  = ProductionName "=" [ expression ] "." .
+expression  = term { "|" term } .
+term        = factor { factor } .
 factor      = ProductionName 
-            | Token ["…" Token] 
+            | Token [ "…" Token ] 
             | group 
             | option 
             | repetition .
@@ -87,11 +87,11 @@ In [The Unicode Standard 8.0](https://www.unicode.org/versions/Unicode8.0.0/), S
 The underscore character `_` (U+005F) is considered a lowercase letter.
 
 ```ebnf
-Letter   = UnicodeLetter|"_" .
+Letter   = UnicodeLetter | "_" .
 DecDigit = "0" … "9" .
-BinDigit = "0"|"1" .
+BinDigit = "0" | "1" .
 OctDigit = "0" … "7" .
-HexDigit = "0" … "9"|"A" … "F"|"a" … "f" .
+HexDigit = "0" … "9" | "A" … "F" | "a" … "f" .
 ```
 
 ### Lexical grammar
@@ -102,12 +102,12 @@ HexDigit = "0" … "9"|"A" … "F"|"a" … "f" .
 LF           = /* the Unicode code point U+000A */ .
 CR           = /* the Unicode code point U+000D */ .
 
-BlockComment = "/*" {BlockComment|/* an arbitrary Unicode code point */} "*/" .
-LineComment  = "//" {/* an arbitrary Unicode code point except LF and CR */} .
+BlockComment = "/*" { BlockComment | /* an arbitrary Unicode code point */ } "*/" .
+LineComment  = "//" { /* an arbitrary Unicode code point except LF and CR */ } .
 
-NL           = LF|(CR[LF]) .
+NL           = LF | ( CR [ LF ] ) .
 WS           = /* one of the following Unicode code points: SPACE U+0020, TAB U+0009, Form Feed U+000C */ .
-Hidden       = BlockComment|LineComment|WS
+Hidden       = BlockComment | LineComment | WS .
 ```
 
 Comments serve as program documentation. There are two forms:
@@ -145,14 +145,16 @@ LBrace = "{" .
 RBrace = "}" .
 
 Conj       = "&&" .
-Disj       = "||" .
-EqEq       = "==" .
 ColonColon = "::" .
+Disj       = "||" .
+DotDot     = ".." .
+EqEq       = "==" .
 GE         = ">=" .
 LE         = "<=" .
 MinusEq    = "-=" .
 NotEq      = "!=" .
 PercentEq  = "%=" .
+PipeGt     = "|>" .
 PlusEq     = "+=" .
 SlashEq    = "/=" .
 StarEq     = "*=" .
@@ -162,7 +164,10 @@ Derive  = "derive" .
 Despawn = "despawn" .
 Erase   = "erase" .
 Filter  = "filter" .
+From    = "from" .
 In      = "in" .
+Into    = "into" .
+Insert  = "insert" .
 Match   = "match" .
 Mod     = "mod" .
 Mut     = "mut" .
@@ -179,7 +184,7 @@ Without = "without" .
 ##### Boolean literals
 
 ```ebnf
-BoolLit = "true"|"false" .
+BoolLit = "true" | "false" .
 ```
 
 ##### Integer literals
@@ -189,17 +194,17 @@ An integer literal is a sequence of digits representing an integer constant. An 
 For readability, an underscore character `_` may appear after a base prefix or between successive digits; such underscores do not change the literal's value.
 
 ```ebnf
-DecDigits = DecDigit {["_"] DecDigit} .
-BinDigits = BinDigit {["_"] BinDigit} .
-OctDigits = OctDigit {["_"] OctDigit} .
-HexDigits = HexDigit {["_"] HexDigit} .
+DecDigits = DecDigit { [ "_" ] DecDigit } .
+BinDigits = BinDigit { [ "_" ] BinDigit } .
+OctDigits = OctDigit { [ "_" ] OctDigit } .
+HexDigits = HexDigit { [ "_" ] HexDigit } .
 
-DecLit    = "0"|("1" … "9") [["_"] DecDigits] .
-BinLit    = "0" ("b"|"B") ["_"] BinDigits .
-OctLit    = "0" ["o"|"O"] ["_"] OctDigits .
-HexLit    = "0" ("x"|"X") ["_"] HexDigits .
+DecLit    = "0" | ( "1" … "9" ) [ [ "_" ] DecDigits ] .
+BinLit    = "0" ( "b" | "B" ) [ "_" ] BinDigits .
+OctLit    = "0" [ "o" | "O" ] [ "_" ] OctDigits .
+HexLit    = "0" ( "x" | "X" ) [ "_" ] HexDigits .
 
-IntLit    = DecLit|BinLit|OctLit|HexLit .
+IntLit    = DecLit | BinLit | OctLit | HexLit .
 ```
 
 ```text
@@ -232,19 +237,19 @@ A hexadecimal floating-point literal consists of a `0x` or `0X` prefix, an integ
 For readability, an underscore character `_` may appear after a base prefix or between successive digits; such underscores do not change the literal value.
 
 ```ebnf
-DecExponent = ("e"|"E") ["+"|"-"] DecDigits .
-DecFloatLit = DecDigits "." [DecDigits] [DecExponent]
+DecExponent = ( "e" | "E" ) [ "+" | "-" ] DecDigits .
+DecFloatLit = DecDigits "." [ DecDigits ] [ DecExponent ]
             | DecDigits DecExponent
-            | "." DecDigits [DecExponent] .
+            | "." DecDigits [ DecExponent ] .
 
-HexExponent = ("p"|"P") ["+"|"-"] DecDigits .
-HexMantissa = ["_"] HexDigits "." [HexDigits]
-            | ["_"] HexDigits
+HexExponent = ( "p" | "P" ) [ "+" | "-" ] DecDigits .
+HexMantissa = [ "_" ] HexDigits "." [ HexDigits ]
+            | [ "_" ] HexDigits
             | "." HexDigits .
 
-HexFloatLit = "0" ("x"|"X") HexMantissa HexExponent .
+HexFloatLit = "0" ( "x" | "X" ) HexMantissa HexExponent .
 
-FloatLit    = DecFloatLit|HexFloatLit .
+FloatLit    = DecFloatLit | HexFloatLit .
 ```
 
 ```text
@@ -287,8 +292,8 @@ Escaped identifiers are treated the same as corresponding non-escaped identifier
 
 ```ebnf
 QuotedSymbol = /* an arbitrary Unicode code point except LF, CR and "`" */ .
-RawIdent     = "`" QuotedSymbol {QuotedSymbol} "`" .
-Ident        = Letter {Letter|UnicodeDigit} .
+RawIdent     = "`" QuotedSymbol { QuotedSymbol } "`" .
+Ident        = Letter { Letter | UnicodeDigit } .
 ```
 
 ```text
@@ -327,14 +332,16 @@ AliceToken = BlockComment
            | LBrace
            | RBrace
            | Conj
-           | Disj
-           | EqEq
            | ColonColon
+           | Disj
+           | DotDot
+           | EqEq
            | GE
            | LE
            | MinusEq
            | NotEq
            | PercentEq
+           | PipeGt
            | PlusEq
            | StarEq
            | SlashEq
@@ -343,7 +350,10 @@ AliceToken = BlockComment
            | Despawn
            | Erase
            | Filter
+           | From
            | In
+           | Into
+           | Insert
            | Match
            | Mod
            | Mut
@@ -367,80 +377,99 @@ EOF        = /* end of input */ .
 The grammar below replaces some lexical grammar rules with explicit literals (where such replacement in trivial and always correct, for example, for keywords) for better readability.
 
 ```ebnf
-alice_file = {NL} {stmt semi} EOF .
+alice_file = { NL } { stmt semi } EOF .
 
-stmt = assign_stmt
-     | use_stmt
-     | decl .
+stmt       = use_stmt | decl .
+use_stmt   = "use" ident [ "::" "*" ] .
 
-assign_stmt = [modifier] simple_ident "=" expr .
-use_stmt = "use" ident ["::" "*"] .
+decl       = const_decl | mod_decl | prop_decl | sys_decl .
 
-decl = const_decl
-     | mod_decl
-     | prop_decl
-     | sys_decl .
+const_decl = "const" simple_ident [ type_anno ] "=" expr .
 
-const_decl = "const" simple_ident [type_anno] "=" expr .
+mod_decl  = "mod" simple_ident [ [ NL ] mod_body ] .
+mod_body  = "{" { NL } { stmt semi } { NL } "}" .
 
-mod_decl  = "mod" simple_ident [[NL] mod_body] .
-mod_body  = "{" {NL} {top_level_obj} {NL} "}" .
+prop_decl = "prop" simple_ident [ prop_body ] .
+prop_body = enum_prop_body
+          | ( [ NL ] record_prop_body )
+          | tuple_prop_body .
 
-prop_decl      = "prop" simple_ident [prop_body] .
-prop_body      = enum_prop_body
-               | ([NL] record_prop_body)
-               | tuple_prop_body .
+enum_prop_body = "=" [ NL "|" ] enum_ctors .
+enum_ctors     = enum_ctor { [ NL ] "|" enum_ctor }
+enum_ctor      = simple_ident [ types_list ] .
 
-enum_prop_body = "=" [NL] enum_ctor {[NL] "|" enum_ctor} .
-enum_ctor      = simple_ident ["(" {NL} type {"," {NL} type} ")"] .
+record_prop_body = "{" { NL } { field_decl semi } "}" .
+field_decl       = simple_ident type_anno .
 
-record_prop_body = "{" {NL} {field_decl} "}" .
-field_decl       = simple_ident ":" type .
+tuple_prop_body = types_list .
 
-tuple_prop_body = "(" types_list ")" .
+sys_stmt    = "in" { NL } ident { NL } sys_body .
+sys_body    = "{" { NL } pipeline { NL } "}" .
+pipeline    = stages_list .
+stages_list = stage { pipe_sep stage } .
+stage       = derive_stage
+            | despawn_stage
+            | erase_stage
+            | filter_stage
+            | insert_stage
+            | query_stage
+            | spawn_stage
+            | with_stage
+            | without_stage .
+              
+derive_stage  = "derive" [ simple_ident [ type_anno ] "=" ] expr .
 
-sys_stmt       = "in" {NL} ident {NL} sys_body .
-sys_body       = "{" {NL} pipeline {NL} "}" .
-pipeline       = spawn_expr|despawn_expr|query_expr .
+despawn_stage = "despawn" [ ref_expr { "," ref_expr } ] .
+
+erase_stage   = "erase" ref_expr "from" ref_expr .
+
+filter_stage  = "filter" expr .
+
+insert_stage  = "insert" ref_expr "into" ref_expr .
+
+query_stage   = "query" params_list .
+
+spawn_stage   = "spawn" [ simple_ident ] bundle .
+
+with_stage    = "with" expr .
+
+without_stage = "without" expr .
+
+bundle = "{" { NL } ref_expr { semi } "}" .
 
 expr            = disj_expr .
-disj_expr       = conj_expr {{NL} "||" {NL} conj_expr} .
-conj_expr       = eq_expr {{NL} "&&" {NL} eq_expr} .
-eq_expr         = cmp_expr {eq_op {NL} cmp_expr} .
-cmp_expr        = term_expr {cmp_op {NL} term_expr} .
-term_expr       = factor_expr {add_op {NL} factor_expr} .
-factor_expr     = unary_expr {mul_op unary_expr} .
+disj_expr       = conj_expr { { NL } "||" { NL } conj_expr } .
+conj_expr       = eq_expr { { NL } "&&" { NL } eq_expr } .
+eq_expr         = cmp_expr { eq_op { NL } cmp_expr } .
+cmp_expr        = term_expr {cmp_op { NL } term_expr } .
+term_expr       = factor_expr { add_op { NL } factor_expr } .
+factor_expr     = unary_expr { mul_op unary_expr } .
 unary_expr      = unary_op unary_expr | primary_expr .
 primary_expr    = paren_expr
                 | ref_expr
                 | lit_const_expr .
-paren_expr      = "(" {NL} expr {NL} ")" .
+paren_expr      = "(" { NL } expr { NL } ")" .
 ref_expr        = ident .
 lit_const_expr  = BoolLit | IntLit | FloatLit .
-assign_expr     = expr "=" expr .
 
-eq_op  = "==" 
-       | "!=" .
-cmp_op = "<" 
-       | ">" 
-       | "<=" 
-       | ">=" .
-add_op = "+" 
-       | "-" .
-mul_op = "*" 
-       | "/" 
-       | "%" .
+eq_op    = "==" | "!=" .
+cmp_op   = "<" | ">" | "<=" | ">=" .
+add_op   = "+" | "-" .
+mul_op   = "*" | "/" | "%" .
 unary_op = "!" | "-" .
 
-params_list = param {"," param} .
-param       = simple_ident type_anno .
+params_list    = "(" param { "," param } ")" .
+param          = [ param_modifier ] simple_ident type_anno .
+param_modifier = "mut" .
 
-type_anno    = ":" type .
-types_list   = type {"," type} .
-type         = ["?"] ident .
-ident        = simple_ident {"::" simple_ident} .
-simple_ident = RawIdent|Ident .
+types_list    = "(" { NL } type {"," { NL } type } ")" .
+type_anno     = ":" type .
+type          = [ type_modifier ] ident .
+type_modifier = "?" .
 
-semi        = (";"|NL) {NL} .
-pipe_gt_sep = ("|>"|NL) {NL} .
+ident         = simple_ident { "::" simple_ident } .
+simple_ident  = RawIdent | Ident .
+
+semi     = ( ";" | NL ) { NL } .
+pipe_sep = ( "|>" | NL ) { NL } .
 ```
