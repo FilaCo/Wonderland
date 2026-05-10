@@ -1,15 +1,16 @@
 use super::*;
 use expect_test::{Expect, expect};
 
-fn check(input: &str, expected: Expect) {
+fn check_lexing(input: &str, expected: Expect) {
     let tokens: Vec<Token> = Cursor::tokenize(input).collect();
     expected.assert_debug_eq(&tokens);
 }
 
 #[test]
 fn tokenize_empty_input() {
-    check(
-        "",
+    let input = "";
+    check_lexing(
+        input,
         expect![[r#"
         []
     "#]],
@@ -18,8 +19,9 @@ fn tokenize_empty_input() {
 
 #[test]
 fn tokenize_only_whitespace() {
-    check(
-        "   \t\u{000C} ",
+    let input = "   \t\u{000C} ";
+    check_lexing(
+        input,
         expect![[r#"
         [
             Token {
@@ -33,8 +35,9 @@ fn tokenize_only_whitespace() {
 
 #[test]
 fn tokenize_only_newlines_and_crlf() {
-    check(
-        "\n\r\n\r\n\r",
+    let input = "\n\r\n\r\n\r";
+    check_lexing(
+        input,
         expect![[r#"
         [
             Token {
@@ -60,31 +63,33 @@ fn tokenize_only_newlines_and_crlf() {
 
 #[test]
 fn tokenize_unknown_token() {
-    check(
-        "№ ?",
+    let input = "№ ?";
+    check_lexing(
+        input,
         expect![[r#"
-        [
-            Token {
-                kind: Unknown,
-                len: 3,
-            },
-            Token {
-                kind: WS,
-                len: 1,
-            },
-            Token {
-                kind: Quest,
-                len: 1,
-            },
-        ]
-    "#]],
+            [
+                Token {
+                    kind: Unknown,
+                    len: 3,
+                },
+                Token {
+                    kind: WS,
+                    len: 1,
+                },
+                Token {
+                    kind: Quest,
+                    len: 1,
+                },
+            ]
+        "#]],
     );
 }
 
 #[test]
 fn tokenize_integers_all_bases() {
-    check(
-        "0 1_000 0b101 0o7 0x1A_b 0B1 0O1 0X1 0b 0o 0x",
+    let input = "0 1_000 0b101 0o7 0x1A_b 0B1 0O1 0X1 0b 0o 0x";
+    check_lexing(
+        input,
         expect![[r#"
             [
                 Token {
@@ -233,110 +238,120 @@ fn tokenize_integers_all_bases() {
 
 #[test]
 fn tokenize_floats_and_exponents() {
-    check(
-        "1.5 1e10 1.5e+10 1e 1.",
+    let input = "1.5 1e10 1.5e+10 1e 1.";
+    check_lexing(
+        input,
         expect![[r#"
-        [
-            Token {
-                kind: Literal {
-                    kind: Float {
-                        base: Dec,
-                        empty_exp: false,
+            [
+                Token {
+                    kind: Literal {
+                        kind: Float {
+                            base: Dec,
+                            empty_exp: false,
+                        },
                     },
+                    len: 3,
                 },
-                len: 3,
-            },
-            Token {
-                kind: WS,
-                len: 1,
-            },
-            Token {
-                kind: Literal {
-                    kind: Float {
-                        base: Dec,
-                        empty_exp: false,
+                Token {
+                    kind: WS,
+                    len: 1,
+                },
+                Token {
+                    kind: Literal {
+                        kind: Float {
+                            base: Dec,
+                            empty_exp: false,
+                        },
                     },
+                    len: 4,
                 },
-                len: 4,
-            },
-            Token {
-                kind: WS,
-                len: 1,
-            },
-            Token {
-                kind: Literal {
-                    kind: Float {
-                        base: Dec,
-                        empty_exp: false,
+                Token {
+                    kind: WS,
+                    len: 1,
+                },
+                Token {
+                    kind: Literal {
+                        kind: Float {
+                            base: Dec,
+                            empty_exp: false,
+                        },
                     },
+                    len: 7,
                 },
-                len: 7,
-            },
-            Token {
-                kind: WS,
-                len: 1,
-            },
-            Token {
-                kind: Literal {
-                    kind: Float {
-                        base: Dec,
-                        empty_exp: true,
+                Token {
+                    kind: WS,
+                    len: 1,
+                },
+                Token {
+                    kind: Literal {
+                        kind: Float {
+                            base: Dec,
+                            empty_exp: true,
+                        },
                     },
+                    len: 2,
                 },
-                len: 2,
-            },
-            Token {
-                kind: WS,
-                len: 1,
-            },
-            Token {
-                kind: Literal {
-                    kind: Float {
-                        base: Dec,
-                        empty_exp: false,
+                Token {
+                    kind: WS,
+                    len: 1,
+                },
+                Token {
+                    kind: Literal {
+                        kind: Float {
+                            base: Dec,
+                            empty_exp: false,
+                        },
                     },
+                    len: 2,
                 },
-                len: 2,
-            },
-        ]
-    "#]],
+            ]
+        "#]],
     );
 }
 
 #[test]
 fn tokenize_int_dot_ident_does_not_become_float() {
-    check(
-        "1.foo",
+    let input = "1.foo";
+    check_lexing(
+        input,
         expect![[r#"
-        [
-            Token {
-                kind: Literal {
-                    kind: Int {
-                        base: Dec,
-                        empty_int: false,
+            [
+                Token {
+                    kind: Literal {
+                        kind: Int {
+                            base: Dec,
+                            empty_int: false,
+                        },
                     },
+                    len: 1,
                 },
-                len: 1,
-            },
-            Token {
-                kind: Dot,
-                len: 1,
-            },
-            Token {
-                kind: Ident,
-                len: 3,
-            },
-        ]
-    "#]],
+                Token {
+                    kind: Dot,
+                    len: 1,
+                },
+                Token {
+                    kind: Ident,
+                    len: 3,
+                },
+            ]
+        "#]],
     );
 }
 
 #[test]
 fn tokenize_line_and_block_comments() {
-    check(
-        "// line comment\n/* block */ /",
+    let input = r#"
+// line comment
+/* block */ /
+"#;
+    check_lexing(
+        input,
         expect![[r#"
         [
+            Token {
+                kind: NL,
+                len: 1,
+            },
             Token {
                 kind: LineComment,
                 len: 15,
@@ -359,6 +374,10 @@ fn tokenize_line_and_block_comments() {
                 kind: Slash,
                 len: 1,
             },
+            Token {
+                kind: NL,
+                len: 1,
+            },
         ]
     "#]],
     );
@@ -366,59 +385,76 @@ fn tokenize_line_and_block_comments() {
 
 #[test]
 fn tokenize_nested_and_unterminated_block_comments() {
-    check(
-        "/* /* nested */ */\n/* */ */\n/* unterminated",
+    let input = r#"
+/* /* nested */ */
+/* */ */
+/* unterminated
+"#;
+    check_lexing(
+        input,
         expect![[r#"
-            [
-                Token {
-                    kind: BlockComment {
-                        terminated: true,
-                    },
-                    len: 18,
+        [
+            Token {
+                kind: NL,
+                len: 1,
+            },
+            Token {
+                kind: BlockComment {
+                    terminated: true,
                 },
-                Token {
-                    kind: NL,
-                    len: 1,
+                len: 18,
+            },
+            Token {
+                kind: NL,
+                len: 1,
+            },
+            Token {
+                kind: BlockComment {
+                    terminated: true,
                 },
-                Token {
-                    kind: BlockComment {
-                        terminated: true,
-                    },
-                    len: 5,
+                len: 5,
+            },
+            Token {
+                kind: WS,
+                len: 1,
+            },
+            Token {
+                kind: Star,
+                len: 1,
+            },
+            Token {
+                kind: Slash,
+                len: 1,
+            },
+            Token {
+                kind: NL,
+                len: 1,
+            },
+            Token {
+                kind: BlockComment {
+                    terminated: false,
                 },
-                Token {
-                    kind: WS,
-                    len: 1,
-                },
-                Token {
-                    kind: Star,
-                    len: 1,
-                },
-                Token {
-                    kind: Slash,
-                    len: 1,
-                },
-                Token {
-                    kind: NL,
-                    len: 1,
-                },
-                Token {
-                    kind: BlockComment {
-                        terminated: false,
-                    },
-                    len: 15,
-                },
-            ]
-        "#]],
+                len: 16,
+            },
+        ]
+    "#]],
     );
 }
 
 #[test]
 fn tokenize_doc_comment_with_multibyte() {
-    check(
-        "// 界界\n/* 界 */",
+    let input = r#"
+// 界界
+/* 界 */
+"#;
+    check_lexing(
+        input,
         expect![[r#"
         [
+            Token {
+                kind: NL,
+                len: 1,
+            },
             Token {
                 kind: LineComment,
                 len: 9,
@@ -433,6 +469,10 @@ fn tokenize_doc_comment_with_multibyte() {
                 },
                 len: 9,
             },
+            Token {
+                kind: NL,
+                len: 1,
+            },
         ]
     "#]],
     );
@@ -440,94 +480,53 @@ fn tokenize_doc_comment_with_multibyte() {
 
 #[test]
 fn tokenize_idents_ascii_and_underscore() {
-    check(
-        "foo _bar a1b2 _ Foo",
-        expect![[r#"
-        [
-            Token {
-                kind: Ident,
-                len: 3,
-            },
-            Token {
-                kind: WS,
-                len: 1,
-            },
-            Token {
-                kind: Ident,
-                len: 4,
-            },
-            Token {
-                kind: WS,
-                len: 1,
-            },
-            Token {
-                kind: Ident,
-                len: 4,
-            },
-            Token {
-                kind: WS,
-                len: 1,
-            },
-            Token {
-                kind: Ident,
-                len: 5,
-            },
-        ]
-    "#]],
-    );
-}
-
-#[test]
-fn tokenize_idents_unicode_xid() {
-    check(
-        "αβγ привет 界面",
-        expect![[r#"
-        [
-            Token {
-                kind: Ident,
-                len: 6,
-            },
-            Token {
-                kind: WS,
-                len: 1,
-            },
-            Token {
-                kind: Ident,
-                len: 12,
-            },
-            Token {
-                kind: WS,
-                len: 1,
-            },
-            Token {
-                kind: Ident,
-                len: 6,
-            },
-        ]
-    "#]],
-    );
-}
-
-#[test]
-fn tokenize_raw_idents_terminated_and_unterminated() {
-    check(
-        "`foo` `prop` `with space` `multi\nline` `unterm",
+    let input = "foo _bar a1b2 _ Foo";
+    check_lexing(
+        input,
         expect![[r#"
             [
                 Token {
-                    kind: RawIdent {
-                        terminated: true,
-                    },
-                    len: 5,
+                    kind: Ident,
+                    len: 3,
                 },
                 Token {
                     kind: WS,
                     len: 1,
                 },
                 Token {
-                    kind: RawIdent {
-                        terminated: true,
-                    },
+                    kind: Ident,
+                    len: 4,
+                },
+                Token {
+                    kind: WS,
+                    len: 1,
+                },
+                Token {
+                    kind: Ident,
+                    len: 4,
+                },
+                Token {
+                    kind: WS,
+                    len: 1,
+                },
+                Token {
+                    kind: Ident,
+                    len: 5,
+                },
+            ]
+        "#]],
+    );
+}
+
+#[test]
+fn tokenize_idents_unicode_xid() {
+    let input = "αβγ привет 界面";
+    check_lexing(
+        input,
+        expect![[r#"
+            [
+                Token {
+                    kind: Ident,
                     len: 6,
                 },
                 Token {
@@ -535,30 +534,12 @@ fn tokenize_raw_idents_terminated_and_unterminated() {
                     len: 1,
                 },
                 Token {
-                    kind: RawIdent {
-                        terminated: true,
-                    },
+                    kind: Ident,
                     len: 12,
                 },
                 Token {
                     kind: WS,
                     len: 1,
-                },
-                Token {
-                    kind: RawIdent {
-                        terminated: false,
-                    },
-                    len: 7,
-                },
-                Token {
-                    kind: Ident,
-                    len: 4,
-                },
-                Token {
-                    kind: RawIdent {
-                        terminated: true,
-                    },
-                    len: 3,
                 },
                 Token {
                     kind: Ident,
@@ -570,173 +551,71 @@ fn tokenize_raw_idents_terminated_and_unterminated() {
 }
 
 #[test]
-fn tokenize_all_single_char_punctuation() {
-    check(
-        "& , : . = ! > < - | % + ? ; / * ~ { } ( )",
+fn tokenize_raw_idents_terminated_and_unterminated() {
+    let input = r#"
+`foo` `prop` `with space` `multi
+line` `unterm
+"#;
+    check_lexing(
+        input,
         expect![[r#"
         [
             Token {
-                kind: And,
+                kind: NL,
                 len: 1,
+            },
+            Token {
+                kind: RawIdent {
+                    terminated: true,
+                },
+                len: 5,
             },
             Token {
                 kind: WS,
                 len: 1,
             },
             Token {
-                kind: Comma,
-                len: 1,
+                kind: RawIdent {
+                    terminated: true,
+                },
+                len: 6,
             },
             Token {
                 kind: WS,
                 len: 1,
             },
             Token {
-                kind: Colon,
-                len: 1,
+                kind: RawIdent {
+                    terminated: true,
+                },
+                len: 12,
             },
             Token {
                 kind: WS,
                 len: 1,
             },
             Token {
-                kind: Dot,
-                len: 1,
+                kind: RawIdent {
+                    terminated: false,
+                },
+                len: 7,
             },
             Token {
-                kind: WS,
-                len: 1,
+                kind: Ident,
+                len: 4,
             },
             Token {
-                kind: Eq,
-                len: 1,
+                kind: RawIdent {
+                    terminated: true,
+                },
+                len: 3,
             },
             Token {
-                kind: WS,
-                len: 1,
+                kind: Ident,
+                len: 6,
             },
             Token {
-                kind: Excl,
-                len: 1,
-            },
-            Token {
-                kind: WS,
-                len: 1,
-            },
-            Token {
-                kind: GT,
-                len: 1,
-            },
-            Token {
-                kind: WS,
-                len: 1,
-            },
-            Token {
-                kind: LT,
-                len: 1,
-            },
-            Token {
-                kind: WS,
-                len: 1,
-            },
-            Token {
-                kind: Minus,
-                len: 1,
-            },
-            Token {
-                kind: WS,
-                len: 1,
-            },
-            Token {
-                kind: Or,
-                len: 1,
-            },
-            Token {
-                kind: WS,
-                len: 1,
-            },
-            Token {
-                kind: Percent,
-                len: 1,
-            },
-            Token {
-                kind: WS,
-                len: 1,
-            },
-            Token {
-                kind: Plus,
-                len: 1,
-            },
-            Token {
-                kind: WS,
-                len: 1,
-            },
-            Token {
-                kind: Quest,
-                len: 1,
-            },
-            Token {
-                kind: WS,
-                len: 1,
-            },
-            Token {
-                kind: Semi,
-                len: 1,
-            },
-            Token {
-                kind: WS,
-                len: 1,
-            },
-            Token {
-                kind: Slash,
-                len: 1,
-            },
-            Token {
-                kind: WS,
-                len: 1,
-            },
-            Token {
-                kind: Star,
-                len: 1,
-            },
-            Token {
-                kind: WS,
-                len: 1,
-            },
-            Token {
-                kind: Tilde,
-                len: 1,
-            },
-            Token {
-                kind: WS,
-                len: 1,
-            },
-            Token {
-                kind: LBrace,
-                len: 1,
-            },
-            Token {
-                kind: WS,
-                len: 1,
-            },
-            Token {
-                kind: RBrace,
-                len: 1,
-            },
-            Token {
-                kind: WS,
-                len: 1,
-            },
-            Token {
-                kind: LParen,
-                len: 1,
-            },
-            Token {
-                kind: WS,
-                len: 1,
-            },
-            Token {
-                kind: RParen,
+                kind: NL,
                 len: 1,
             },
         ]
@@ -745,11 +624,194 @@ fn tokenize_all_single_char_punctuation() {
 }
 
 #[test]
+fn tokenize_all_single_char_punctuation() {
+    let input = "& , : . = ! > < - | % + ? ; / * ~ { } ( )";
+    check_lexing(
+        input,
+        expect![[r#"
+            [
+                Token {
+                    kind: And,
+                    len: 1,
+                },
+                Token {
+                    kind: WS,
+                    len: 1,
+                },
+                Token {
+                    kind: Comma,
+                    len: 1,
+                },
+                Token {
+                    kind: WS,
+                    len: 1,
+                },
+                Token {
+                    kind: Colon,
+                    len: 1,
+                },
+                Token {
+                    kind: WS,
+                    len: 1,
+                },
+                Token {
+                    kind: Dot,
+                    len: 1,
+                },
+                Token {
+                    kind: WS,
+                    len: 1,
+                },
+                Token {
+                    kind: Eq,
+                    len: 1,
+                },
+                Token {
+                    kind: WS,
+                    len: 1,
+                },
+                Token {
+                    kind: Excl,
+                    len: 1,
+                },
+                Token {
+                    kind: WS,
+                    len: 1,
+                },
+                Token {
+                    kind: GT,
+                    len: 1,
+                },
+                Token {
+                    kind: WS,
+                    len: 1,
+                },
+                Token {
+                    kind: LT,
+                    len: 1,
+                },
+                Token {
+                    kind: WS,
+                    len: 1,
+                },
+                Token {
+                    kind: Minus,
+                    len: 1,
+                },
+                Token {
+                    kind: WS,
+                    len: 1,
+                },
+                Token {
+                    kind: Or,
+                    len: 1,
+                },
+                Token {
+                    kind: WS,
+                    len: 1,
+                },
+                Token {
+                    kind: Percent,
+                    len: 1,
+                },
+                Token {
+                    kind: WS,
+                    len: 1,
+                },
+                Token {
+                    kind: Plus,
+                    len: 1,
+                },
+                Token {
+                    kind: WS,
+                    len: 1,
+                },
+                Token {
+                    kind: Quest,
+                    len: 1,
+                },
+                Token {
+                    kind: WS,
+                    len: 1,
+                },
+                Token {
+                    kind: Semi,
+                    len: 1,
+                },
+                Token {
+                    kind: WS,
+                    len: 1,
+                },
+                Token {
+                    kind: Slash,
+                    len: 1,
+                },
+                Token {
+                    kind: WS,
+                    len: 1,
+                },
+                Token {
+                    kind: Star,
+                    len: 1,
+                },
+                Token {
+                    kind: WS,
+                    len: 1,
+                },
+                Token {
+                    kind: Tilde,
+                    len: 1,
+                },
+                Token {
+                    kind: WS,
+                    len: 1,
+                },
+                Token {
+                    kind: LBrace,
+                    len: 1,
+                },
+                Token {
+                    kind: WS,
+                    len: 1,
+                },
+                Token {
+                    kind: RBrace,
+                    len: 1,
+                },
+                Token {
+                    kind: WS,
+                    len: 1,
+                },
+                Token {
+                    kind: LParen,
+                    len: 1,
+                },
+                Token {
+                    kind: WS,
+                    len: 1,
+                },
+                Token {
+                    kind: RParen,
+                    len: 1,
+                },
+            ]
+        "#]],
+    );
+}
+
+#[test]
 fn tokenize_program_use_stmt() {
-    check(
-        "use core::math::*",
+    let input = r#"
+use std::2d::*
+"#;
+    check_lexing(
+        input,
         expect![[r#"
         [
+            Token {
+                kind: NL,
+                len: 1,
+            },
             Token {
                 kind: Ident,
                 len: 3,
@@ -760,7 +822,7 @@ fn tokenize_program_use_stmt() {
             },
             Token {
                 kind: Ident,
-                len: 4,
+                len: 3,
             },
             Token {
                 kind: Colon,
@@ -768,15 +830,20 @@ fn tokenize_program_use_stmt() {
             },
             Token {
                 kind: Colon,
+                len: 1,
+            },
+            Token {
+                kind: Literal {
+                    kind: Int {
+                        base: Dec,
+                        empty_int: false,
+                    },
+                },
                 len: 1,
             },
             Token {
                 kind: Ident,
-                len: 4,
-            },
-            Token {
-                kind: Colon,
-                len: 1,
+                len: 2,
             },
             Token {
                 kind: Colon,
@@ -786,6 +853,10 @@ fn tokenize_program_use_stmt() {
                 kind: Star,
                 len: 1,
             },
+            Token {
+                kind: NL,
+                len: 1,
+            },
         ]
     "#]],
     );
@@ -793,11 +864,18 @@ fn tokenize_program_use_stmt() {
 
 #[test]
 fn tokenize_program_const_decl() {
-    let src = "const PI: f64 = 3.14159\nconst MAX_HP = 100";
-    check(
-        src,
+    let input = r#"
+const PI: float = 3.14159
+const MAX_HP = 100
+"#;
+    check_lexing(
+        input,
         expect![[r#"
         [
+            Token {
+                kind: NL,
+                len: 1,
+            },
             Token {
                 kind: Ident,
                 len: 5,
@@ -820,7 +898,7 @@ fn tokenize_program_const_decl() {
             },
             Token {
                 kind: Ident,
-                len: 3,
+                len: 5,
             },
             Token {
                 kind: WS,
@@ -880,6 +958,10 @@ fn tokenize_program_const_decl() {
                 },
                 len: 3,
             },
+            Token {
+                kind: NL,
+                len: 1,
+            },
         ]
     "#]],
     );
@@ -887,546 +969,529 @@ fn tokenize_program_const_decl() {
 
 #[test]
 fn tokenize_program_record_prop() {
-    let src = "prop Position {\n    x: f32;\n    y: f32;\n}";
-    check(
-        src,
+    let input = r#"
+prop Position {
+    x: float
+    y: float
+}
+"#;
+    check_lexing(
+        input,
         expect![[r#"
-        [
-            Token {
-                kind: Ident,
-                len: 4,
-            },
-            Token {
-                kind: WS,
-                len: 1,
-            },
-            Token {
-                kind: Ident,
-                len: 8,
-            },
-            Token {
-                kind: WS,
-                len: 1,
-            },
-            Token {
-                kind: LBrace,
-                len: 1,
-            },
-            Token {
-                kind: NL,
-                len: 1,
-            },
-            Token {
-                kind: WS,
-                len: 4,
-            },
-            Token {
-                kind: Ident,
-                len: 2,
-            },
-            Token {
-                kind: WS,
-                len: 1,
-            },
-            Token {
-                kind: Ident,
-                len: 3,
-            },
-            Token {
-                kind: Semi,
-                len: 1,
-            },
-            Token {
-                kind: NL,
-                len: 1,
-            },
-            Token {
-                kind: WS,
-                len: 4,
-            },
-            Token {
-                kind: Ident,
-                len: 2,
-            },
-            Token {
-                kind: WS,
-                len: 1,
-            },
-            Token {
-                kind: Ident,
-                len: 3,
-            },
-            Token {
-                kind: Semi,
-                len: 1,
-            },
-            Token {
-                kind: NL,
-                len: 1,
-            },
-            Token {
-                kind: RBrace,
-                len: 1,
-            },
-        ]
-    "#]],
+            [
+                Token {
+                    kind: NL,
+                    len: 1,
+                },
+                Token {
+                    kind: Ident,
+                    len: 4,
+                },
+                Token {
+                    kind: WS,
+                    len: 1,
+                },
+                Token {
+                    kind: Ident,
+                    len: 8,
+                },
+                Token {
+                    kind: WS,
+                    len: 1,
+                },
+                Token {
+                    kind: LBrace,
+                    len: 1,
+                },
+                Token {
+                    kind: NL,
+                    len: 1,
+                },
+                Token {
+                    kind: WS,
+                    len: 4,
+                },
+                Token {
+                    kind: Ident,
+                    len: 2,
+                },
+                Token {
+                    kind: WS,
+                    len: 1,
+                },
+                Token {
+                    kind: Ident,
+                    len: 5,
+                },
+                Token {
+                    kind: NL,
+                    len: 1,
+                },
+                Token {
+                    kind: WS,
+                    len: 4,
+                },
+                Token {
+                    kind: Ident,
+                    len: 2,
+                },
+                Token {
+                    kind: WS,
+                    len: 1,
+                },
+                Token {
+                    kind: Ident,
+                    len: 5,
+                },
+                Token {
+                    kind: NL,
+                    len: 1,
+                },
+                Token {
+                    kind: RBrace,
+                    len: 1,
+                },
+                Token {
+                    kind: NL,
+                    len: 1,
+                },
+            ]
+        "#]],
     );
 }
 
 #[test]
 fn tokenize_program_enum_prop() {
-    let src = "prop State =\n    | Idle\n    | Running(f32)\n    | Dead";
-    check(
-        src,
+    let input = r#"
+prop State = Idle
+           | Running(float)
+           | Dead
+"#;
+    check_lexing(
+        input,
         expect![[r#"
-        [
-            Token {
-                kind: Ident,
-                len: 4,
-            },
-            Token {
-                kind: WS,
-                len: 1,
-            },
-            Token {
-                kind: Ident,
-                len: 5,
-            },
-            Token {
-                kind: WS,
-                len: 1,
-            },
-            Token {
-                kind: Eq,
-                len: 1,
-            },
-            Token {
-                kind: NL,
-                len: 1,
-            },
-            Token {
-                kind: WS,
-                len: 4,
-            },
-            Token {
-                kind: Or,
-                len: 1,
-            },
-            Token {
-                kind: WS,
-                len: 1,
-            },
-            Token {
-                kind: Ident,
-                len: 4,
-            },
-            Token {
-                kind: NL,
-                len: 1,
-            },
-            Token {
-                kind: WS,
-                len: 4,
-            },
-            Token {
-                kind: Or,
-                len: 1,
-            },
-            Token {
-                kind: WS,
-                len: 1,
-            },
-            Token {
-                kind: Ident,
-                len: 7,
-            },
-            Token {
-                kind: LParen,
-                len: 1,
-            },
-            Token {
-                kind: Ident,
-                len: 3,
-            },
-            Token {
-                kind: RParen,
-                len: 1,
-            },
-            Token {
-                kind: NL,
-                len: 1,
-            },
-            Token {
-                kind: WS,
-                len: 4,
-            },
-            Token {
-                kind: Or,
-                len: 1,
-            },
-            Token {
-                kind: WS,
-                len: 1,
-            },
-            Token {
-                kind: Ident,
-                len: 4,
-            },
-        ]
-    "#]],
+            [
+                Token {
+                    kind: NL,
+                    len: 1,
+                },
+                Token {
+                    kind: Ident,
+                    len: 4,
+                },
+                Token {
+                    kind: WS,
+                    len: 1,
+                },
+                Token {
+                    kind: Ident,
+                    len: 5,
+                },
+                Token {
+                    kind: WS,
+                    len: 1,
+                },
+                Token {
+                    kind: Eq,
+                    len: 1,
+                },
+                Token {
+                    kind: WS,
+                    len: 1,
+                },
+                Token {
+                    kind: Ident,
+                    len: 4,
+                },
+                Token {
+                    kind: NL,
+                    len: 1,
+                },
+                Token {
+                    kind: WS,
+                    len: 11,
+                },
+                Token {
+                    kind: Or,
+                    len: 1,
+                },
+                Token {
+                    kind: WS,
+                    len: 1,
+                },
+                Token {
+                    kind: Ident,
+                    len: 7,
+                },
+                Token {
+                    kind: LParen,
+                    len: 1,
+                },
+                Token {
+                    kind: Ident,
+                    len: 5,
+                },
+                Token {
+                    kind: RParen,
+                    len: 1,
+                },
+                Token {
+                    kind: NL,
+                    len: 1,
+                },
+                Token {
+                    kind: WS,
+                    len: 11,
+                },
+                Token {
+                    kind: Or,
+                    len: 1,
+                },
+                Token {
+                    kind: WS,
+                    len: 1,
+                },
+                Token {
+                    kind: Ident,
+                    len: 4,
+                },
+                Token {
+                    kind: NL,
+                    len: 1,
+                },
+            ]
+        "#]],
     );
 }
 
 #[test]
 fn tokenize_program_system_with_pipeline() {
-    let src = "in Update {\n    query (mut pos: Position, vel: Velocity)\n    | filter pos.x > 0\n    | derive pos.x = pos.x + vel.x\n}";
-    check(
-        src,
+    let input = r#"
+in Update 
+query mut pos: Position, vel: Velocity
+|> filter pos.x > 0
+|> derive pos.x += vel.x
+"#;
+    check_lexing(
+        input,
         expect![[r#"
-        [
-            Token {
-                kind: Ident,
-                len: 2,
-            },
-            Token {
-                kind: WS,
-                len: 1,
-            },
-            Token {
-                kind: Ident,
-                len: 6,
-            },
-            Token {
-                kind: WS,
-                len: 1,
-            },
-            Token {
-                kind: LBrace,
-                len: 1,
-            },
-            Token {
-                kind: NL,
-                len: 1,
-            },
-            Token {
-                kind: WS,
-                len: 4,
-            },
-            Token {
-                kind: Ident,
-                len: 5,
-            },
-            Token {
-                kind: WS,
-                len: 1,
-            },
-            Token {
-                kind: LParen,
-                len: 1,
-            },
-            Token {
-                kind: Ident,
-                len: 3,
-            },
-            Token {
-                kind: WS,
-                len: 1,
-            },
-            Token {
-                kind: Ident,
-                len: 3,
-            },
-            Token {
-                kind: Colon,
-                len: 1,
-            },
-            Token {
-                kind: WS,
-                len: 1,
-            },
-            Token {
-                kind: Ident,
-                len: 8,
-            },
-            Token {
-                kind: Comma,
-                len: 1,
-            },
-            Token {
-                kind: WS,
-                len: 1,
-            },
-            Token {
-                kind: Ident,
-                len: 3,
-            },
-            Token {
-                kind: Colon,
-                len: 1,
-            },
-            Token {
-                kind: WS,
-                len: 1,
-            },
-            Token {
-                kind: Ident,
-                len: 8,
-            },
-            Token {
-                kind: RParen,
-                len: 1,
-            },
-            Token {
-                kind: NL,
-                len: 1,
-            },
-            Token {
-                kind: WS,
-                len: 4,
-            },
-            Token {
-                kind: Or,
-                len: 1,
-            },
-            Token {
-                kind: WS,
-                len: 1,
-            },
-            Token {
-                kind: Ident,
-                len: 6,
-            },
-            Token {
-                kind: WS,
-                len: 1,
-            },
-            Token {
-                kind: Ident,
-                len: 3,
-            },
-            Token {
-                kind: Dot,
-                len: 1,
-            },
-            Token {
-                kind: Ident,
-                len: 2,
-            },
-            Token {
-                kind: GT,
-                len: 1,
-            },
-            Token {
-                kind: WS,
-                len: 1,
-            },
-            Token {
-                kind: Literal {
-                    kind: Int {
-                        base: Dec,
-                        empty_int: false,
-                    },
+            [
+                Token {
+                    kind: NL,
+                    len: 1,
                 },
-                len: 1,
-            },
-            Token {
-                kind: NL,
-                len: 1,
-            },
-            Token {
-                kind: WS,
-                len: 4,
-            },
-            Token {
-                kind: Or,
-                len: 1,
-            },
-            Token {
-                kind: WS,
-                len: 1,
-            },
-            Token {
-                kind: Ident,
-                len: 6,
-            },
-            Token {
-                kind: WS,
-                len: 1,
-            },
-            Token {
-                kind: Ident,
-                len: 3,
-            },
-            Token {
-                kind: Dot,
-                len: 1,
-            },
-            Token {
-                kind: Ident,
-                len: 2,
-            },
-            Token {
-                kind: Eq,
-                len: 1,
-            },
-            Token {
-                kind: WS,
-                len: 1,
-            },
-            Token {
-                kind: Ident,
-                len: 3,
-            },
-            Token {
-                kind: Dot,
-                len: 1,
-            },
-            Token {
-                kind: Ident,
-                len: 2,
-            },
-            Token {
-                kind: Plus,
-                len: 1,
-            },
-            Token {
-                kind: WS,
-                len: 1,
-            },
-            Token {
-                kind: Ident,
-                len: 3,
-            },
-            Token {
-                kind: Dot,
-                len: 1,
-            },
-            Token {
-                kind: Ident,
-                len: 2,
-            },
-            Token {
-                kind: RBrace,
-                len: 1,
-            },
-        ]
-    "#]],
+                Token {
+                    kind: Ident,
+                    len: 2,
+                },
+                Token {
+                    kind: WS,
+                    len: 1,
+                },
+                Token {
+                    kind: Ident,
+                    len: 6,
+                },
+                Token {
+                    kind: WS,
+                    len: 1,
+                },
+                Token {
+                    kind: NL,
+                    len: 1,
+                },
+                Token {
+                    kind: Ident,
+                    len: 5,
+                },
+                Token {
+                    kind: WS,
+                    len: 1,
+                },
+                Token {
+                    kind: Ident,
+                    len: 3,
+                },
+                Token {
+                    kind: WS,
+                    len: 1,
+                },
+                Token {
+                    kind: Ident,
+                    len: 3,
+                },
+                Token {
+                    kind: Colon,
+                    len: 1,
+                },
+                Token {
+                    kind: WS,
+                    len: 1,
+                },
+                Token {
+                    kind: Ident,
+                    len: 8,
+                },
+                Token {
+                    kind: Comma,
+                    len: 1,
+                },
+                Token {
+                    kind: WS,
+                    len: 1,
+                },
+                Token {
+                    kind: Ident,
+                    len: 3,
+                },
+                Token {
+                    kind: Colon,
+                    len: 1,
+                },
+                Token {
+                    kind: WS,
+                    len: 1,
+                },
+                Token {
+                    kind: Ident,
+                    len: 8,
+                },
+                Token {
+                    kind: NL,
+                    len: 1,
+                },
+                Token {
+                    kind: Or,
+                    len: 1,
+                },
+                Token {
+                    kind: GT,
+                    len: 1,
+                },
+                Token {
+                    kind: WS,
+                    len: 1,
+                },
+                Token {
+                    kind: Ident,
+                    len: 6,
+                },
+                Token {
+                    kind: WS,
+                    len: 1,
+                },
+                Token {
+                    kind: Ident,
+                    len: 3,
+                },
+                Token {
+                    kind: Dot,
+                    len: 1,
+                },
+                Token {
+                    kind: Ident,
+                    len: 2,
+                },
+                Token {
+                    kind: GT,
+                    len: 1,
+                },
+                Token {
+                    kind: WS,
+                    len: 1,
+                },
+                Token {
+                    kind: Literal {
+                        kind: Int {
+                            base: Dec,
+                            empty_int: false,
+                        },
+                    },
+                    len: 1,
+                },
+                Token {
+                    kind: NL,
+                    len: 1,
+                },
+                Token {
+                    kind: Or,
+                    len: 1,
+                },
+                Token {
+                    kind: GT,
+                    len: 1,
+                },
+                Token {
+                    kind: WS,
+                    len: 1,
+                },
+                Token {
+                    kind: Ident,
+                    len: 6,
+                },
+                Token {
+                    kind: WS,
+                    len: 1,
+                },
+                Token {
+                    kind: Ident,
+                    len: 3,
+                },
+                Token {
+                    kind: Dot,
+                    len: 1,
+                },
+                Token {
+                    kind: Ident,
+                    len: 2,
+                },
+                Token {
+                    kind: Plus,
+                    len: 1,
+                },
+                Token {
+                    kind: Eq,
+                    len: 1,
+                },
+                Token {
+                    kind: WS,
+                    len: 1,
+                },
+                Token {
+                    kind: Ident,
+                    len: 3,
+                },
+                Token {
+                    kind: Dot,
+                    len: 1,
+                },
+                Token {
+                    kind: Ident,
+                    len: 2,
+                },
+            ]
+        "#]],
     );
 }
 
 #[test]
 fn tokenize_program_with_comments_and_raw_ident() {
-    let src =
-        "// entity health\nprop `Health!` {\n    current: u32; /* current HP */\n    max: u32;\n}";
-    check(
-        src,
+    let input = r#"
+// entity health
+prop `Health!` {
+    current: int /* current HP */
+    max: int
+}
+"#;
+    check_lexing(
+        input,
         expect![[r#"
-        [
-            Token {
-                kind: LineComment,
-                len: 16,
-            },
-            Token {
-                kind: NL,
-                len: 1,
-            },
-            Token {
-                kind: Ident,
-                len: 4,
-            },
-            Token {
-                kind: WS,
-                len: 1,
-            },
-            Token {
-                kind: RawIdent {
-                    terminated: true,
+            [
+                Token {
+                    kind: NL,
+                    len: 1,
                 },
-                len: 9,
-            },
-            Token {
-                kind: WS,
-                len: 1,
-            },
-            Token {
-                kind: LBrace,
-                len: 1,
-            },
-            Token {
-                kind: NL,
-                len: 1,
-            },
-            Token {
-                kind: WS,
-                len: 4,
-            },
-            Token {
-                kind: Ident,
-                len: 7,
-            },
-            Token {
-                kind: Colon,
-                len: 1,
-            },
-            Token {
-                kind: WS,
-                len: 1,
-            },
-            Token {
-                kind: Ident,
-                len: 3,
-            },
-            Token {
-                kind: Semi,
-                len: 1,
-            },
-            Token {
-                kind: WS,
-                len: 1,
-            },
-            Token {
-                kind: BlockComment {
-                    terminated: true,
+                Token {
+                    kind: LineComment,
+                    len: 16,
                 },
-                len: 16,
-            },
-            Token {
-                kind: NL,
-                len: 1,
-            },
-            Token {
-                kind: WS,
-                len: 4,
-            },
-            Token {
-                kind: Ident,
-                len: 3,
-            },
-            Token {
-                kind: Colon,
-                len: 1,
-            },
-            Token {
-                kind: WS,
-                len: 1,
-            },
-            Token {
-                kind: Ident,
-                len: 3,
-            },
-            Token {
-                kind: Semi,
-                len: 1,
-            },
-            Token {
-                kind: NL,
-                len: 1,
-            },
-            Token {
-                kind: RBrace,
-                len: 1,
-            },
-        ]
-    "#]],
+                Token {
+                    kind: NL,
+                    len: 1,
+                },
+                Token {
+                    kind: Ident,
+                    len: 4,
+                },
+                Token {
+                    kind: WS,
+                    len: 1,
+                },
+                Token {
+                    kind: RawIdent {
+                        terminated: true,
+                    },
+                    len: 9,
+                },
+                Token {
+                    kind: WS,
+                    len: 1,
+                },
+                Token {
+                    kind: LBrace,
+                    len: 1,
+                },
+                Token {
+                    kind: NL,
+                    len: 1,
+                },
+                Token {
+                    kind: WS,
+                    len: 4,
+                },
+                Token {
+                    kind: Ident,
+                    len: 7,
+                },
+                Token {
+                    kind: Colon,
+                    len: 1,
+                },
+                Token {
+                    kind: WS,
+                    len: 1,
+                },
+                Token {
+                    kind: Ident,
+                    len: 3,
+                },
+                Token {
+                    kind: WS,
+                    len: 1,
+                },
+                Token {
+                    kind: BlockComment {
+                        terminated: true,
+                    },
+                    len: 16,
+                },
+                Token {
+                    kind: NL,
+                    len: 1,
+                },
+                Token {
+                    kind: WS,
+                    len: 4,
+                },
+                Token {
+                    kind: Ident,
+                    len: 3,
+                },
+                Token {
+                    kind: Colon,
+                    len: 1,
+                },
+                Token {
+                    kind: WS,
+                    len: 1,
+                },
+                Token {
+                    kind: Ident,
+                    len: 3,
+                },
+                Token {
+                    kind: NL,
+                    len: 1,
+                },
+                Token {
+                    kind: RBrace,
+                    len: 1,
+                },
+                Token {
+                    kind: NL,
+                    len: 1,
+                },
+            ]
+        "#]],
     );
 }
