@@ -251,8 +251,6 @@ impl<'src> Cursor<'src> {
     }
 
     fn raw_ident(&mut self) -> TokenKind {
-        self.bump();
-
         let mut terminated = false;
         while let Some(c) = self.bump() {
             match c {

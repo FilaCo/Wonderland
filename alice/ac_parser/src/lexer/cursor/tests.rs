@@ -340,10 +340,10 @@ fn tokenize_int_dot_ident_does_not_become_float() {
 
 #[test]
 fn tokenize_line_and_block_comments() {
-    let input = r#"
+    let input = "
 // line comment
 /* block */ /
-"#;
+";
     check_lexing(
         input,
         expect![[r#"
@@ -385,11 +385,11 @@ fn tokenize_line_and_block_comments() {
 
 #[test]
 fn tokenize_nested_and_unterminated_block_comments() {
-    let input = r#"
+    let input = "
 /* /* nested */ */
 /* */ */
 /* unterminated
-"#;
+";
     check_lexing(
         input,
         expect![[r#"
@@ -443,10 +443,10 @@ fn tokenize_nested_and_unterminated_block_comments() {
 
 #[test]
 fn tokenize_doc_comment_with_multibyte() {
-    let input = r#"
+    let input = "
 // 界界
 /* 界 */
-"#;
+";
     check_lexing(
         input,
         expect![[r#"
@@ -552,10 +552,10 @@ fn tokenize_idents_unicode_xid() {
 
 #[test]
 fn tokenize_raw_idents_terminated_and_unterminated() {
-    let input = r#"
+    let input = "
 `foo` `prop` `with space` `multi
 line` `unterm
-"#;
+";
     check_lexing(
         input,
         expect![[r#"
@@ -617,6 +617,24 @@ line` `unterm
             Token {
                 kind: NL,
                 len: 1,
+            },
+        ]
+    "#]],
+    );
+}
+
+#[test]
+fn tokenize_empty_raw_ident_is_terminated() {
+    let input = "``";
+    check_lexing(
+        input,
+        expect![[r#"
+        [
+            Token {
+                kind: RawIdent {
+                    terminated: true,
+                },
+                len: 2,
             },
         ]
     "#]],
@@ -801,9 +819,9 @@ fn tokenize_all_single_char_punctuation() {
 
 #[test]
 fn tokenize_program_use_stmt() {
-    let input = r#"
+    let input = "
 use std::2d::*
-"#;
+";
     check_lexing(
         input,
         expect![[r#"
@@ -864,10 +882,10 @@ use std::2d::*
 
 #[test]
 fn tokenize_program_const_decl() {
-    let input = r#"
+    let input = "
 const PI: float = 3.14159
 const MAX_HP = 100
-"#;
+";
     check_lexing(
         input,
         expect![[r#"
@@ -969,12 +987,12 @@ const MAX_HP = 100
 
 #[test]
 fn tokenize_program_record_prop() {
-    let input = r#"
+    let input = "
 prop Position {
     x: float
     y: float
 }
-"#;
+";
     check_lexing(
         input,
         expect![[r#"
@@ -1062,11 +1080,11 @@ prop Position {
 
 #[test]
 fn tokenize_program_enum_prop() {
-    let input = r#"
+    let input = "
 prop State = Idle
            | Running(float)
            | Dead
-"#;
+";
     check_lexing(
         input,
         expect![[r#"
@@ -1166,12 +1184,12 @@ prop State = Idle
 
 #[test]
 fn tokenize_program_system_with_pipeline() {
-    let input = r#"
-in Update 
+    let input = "
+in Update
 query mut pos: Position, vel: Velocity
 |> filter pos.x > 0
 |> derive pos.x += vel.x
-"#;
+";
     check_lexing(
         input,
         expect![[r#"
@@ -1191,10 +1209,6 @@ query mut pos: Position, vel: Velocity
                 Token {
                     kind: Ident,
                     len: 6,
-                },
-                Token {
-                    kind: WS,
-                    len: 1,
                 },
                 Token {
                     kind: NL,
@@ -1376,13 +1390,13 @@ query mut pos: Position, vel: Velocity
 
 #[test]
 fn tokenize_program_with_comments_and_raw_ident() {
-    let input = r#"
+    let input = "
 // entity health
 prop `Health!` {
     current: int /* current HP */
     max: int
 }
-"#;
+";
     check_lexing(
         input,
         expect![[r#"
